@@ -3,5 +3,8 @@ fetch("/payments/config/")
 .then((data) => {
   // Initialize Stripe.js
   const stripe = Stripe(data.publicKey);
-  console.log('stripe: ', stripe);
+
+  // new
+  // Event handler
 });
+

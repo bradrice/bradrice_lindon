@@ -1,0 +1,24 @@
+{% load static %}
+{% load wagtailcore_tags wagtailimages_tags coderedcms_tags %}
+
+<!-- <!DOCTYPE html> -->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Django + Stripe Checkout</title>
+    <script src="{% static 'website/js/custom.js' %}"></script>
+  </head>
+  <body>
+{% block content_body %}
+  <section class="section">
+    <form method="post" action={% url 'create-checkout-session' %}>
+        {% csrf_token %}
+        <input type="hidden" name="product_id" value="prod_Sf1ICdlKf3zgCt">
+        <input type="hidden" name="price_id" value="price_1RjhFyHr3XrGP7sjocSQhToz">
+        <button type="submit">Click Me</button>
+    </form>
+  </section>
+  {% endblock %}
+  </body>
+</html>
