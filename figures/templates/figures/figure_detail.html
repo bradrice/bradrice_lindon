@@ -1,0 +1,25 @@
+{% extends "coderedcms/pages/web_page.html" %}
+{% load wagtailcore_tags wagtailimages_tags coderedcms_tags %}/website/templates/coderedcms/pages/base.html" %}
+
+{% block content %}
+<div class="container">
+<h1>{{ page.title }}</h1>
+{% if page.gallery_number is not None %}
+<h4>Gallery number - {{page.gallery_number}}</h4>
+{% endif %}
+<h2>{{ page.subtitle }}</h2>
+<div class="figure">
+  {% srcset_image page.image width-{360,780,1000} sizes="(max-width: 480px) 800px, 80vw" %}
+</div>
+<p>{{ page.body |richtext}}</p>
+<div>
+<form method="post" action="/payments/create-checkout-session/"
+<input type="hidden" name="product_id" value="prod_I0Ct56Y4YvHQwT"/>
+<input type="hidden" name="price" value="{{ page.price}}"/>
+<input type="hidden" name="price_id" value="{{ page.stripe_price_id}}"/>
+<input type="hidden" name="title" value="{{ page.title}}"/>
+<button type="submit" class="btn btn-primary">Purchase</button>
+</form>
+</div>
+</div>
+{% endblock %}

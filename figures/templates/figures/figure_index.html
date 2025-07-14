@@ -1,0 +1,16 @@
+{% extends "coderedcms/pages/web_page.html" %}
+{% load wagtailcore_tags wagtailimages_tags coderedcms_tags %}/website/templates/coderedcms/pages/base.html" %}
+
+
+{% block content %}
+<div class="container">
+<h2>Art work</h2>
+<p>{{ page.subtitle }}</p>
+{% for figure in figure_entries %}
+<div class="figureblock">
+  <h2>{% if figure.gallery_number is not None %}{{figure.gallery_number}} - {% endif %}{{ figure.title }}</h2>
+  <a href="{{ figure.url }}">Read More</a>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

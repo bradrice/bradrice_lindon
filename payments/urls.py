@@ -12,4 +12,5 @@ urlpatterns = [
     path('success/', views.SuccessView.as_view()),
     path('cancelled/', views.CancelledView.as_view()),
     path('checkout/', views.checkout_view, name='checkout'),
+    path('webhook/', views.stripe_webhook),
 ]

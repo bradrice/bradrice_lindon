@@ -4,8 +4,8 @@ import os
 
 load_dotenv() # Load environment variables from .env
 
-STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
-STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY_PROD")
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY_PROD')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -14,7 +14,7 @@ DEBUG = False
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # Add your site's domain name(s) here.
-ALLOWED_HOSTS = ["bradrice.com"]
+ALLOWED_HOSTS = ["dev.bradrice.com", "bradrice.com"]
 
 # To send email from the server, we recommend django_sendmail_backend
 # Or specify your own email backend such as an SMTP server.

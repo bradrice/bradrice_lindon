@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+load_dotenv() # Load environment variables from .env
 
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
@@ -21,6 +25,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 
+# A list of people who get error notifications.
+ADMINS = [
+    ("Administrator", "bradrice1@gmail.com"),
+]
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -29,6 +39,8 @@ INSTALLED_APPS = [
     "custom_media",
     "custom_user",
     "payments.apps.PaymentsConfig",
+    "figures",
+    "anymail",
     # Wagtail CRX (CodeRed Extensions)
     "coderedcms",
     "django_bootstrap5",
@@ -179,6 +191,20 @@ WAGTAILIMAGES_EXTENSIONS = ["gif", "jpg", "jpeg", "png", "webp", "svg"]
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
 WAGTAILADMIN_BASE_URL = "http://bradrice.com"
+
+#anymail
+
+EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+DEFAULT_FROM_EMAIL = "bra@bradrice.com"
+SERVER_EMAIL = "admin@oh-joy.org"
+MANAGERS = ADMINS
+ANYMAIL = {
+    "MAILGUN_API_KEY": os.getenv("MAILGUN_API_KEY"),
+    "MAILGUN_SENDER_DOMAIN": "mail.oh-joy.org",
+}
+
+# Email address used to send error messages to ADMINS.
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 
 # Tags
