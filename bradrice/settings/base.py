@@ -14,7 +14,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
-load_dotenv() # Load environment variables from .env
+if os.environ.get('APP_ENV') == 'production':
+    load_dotenv(dotenv_path='.env.production')
+else:
+    load_dotenv(dotenv_path='.env.development')
 
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
@@ -221,4 +224,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # custom implementation.
 CRX_DISABLE_NAVBAR = True
 CRX_DISABLE_FOOTER = True
+
 

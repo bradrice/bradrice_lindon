@@ -2,10 +2,12 @@ from .base import *  # noqa
 from dotenv import load_dotenv
 import os
 
-load_dotenv() # Load environment variables from .env
 
-STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY_PROD")
-STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY_PROD')
+DJANGO_ENV = os.getenv('DJANGO_ENV', 'production')  # Default to development
+load_dotenv(dotenv_path=f'.env.{DJANGO_ENV}')
+
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -44,3 +46,28 @@ CACHES = {
         "TIMEOUT": 14400,  # in seconds
     }
 }
+
+# LOGGING = {
+#         'version': 1,
+#         'disable_existing_loggers': False,
+#         'handlers': {
+#             'file': {
+#                 'level': 'DEBUG',
+#                 'class': 'logging.FileHandler',
+#                 'filename': '/path/to/your/django_app.log', # Specify the path to your log file
+#             },
+#         },
+#         'loggers': {
+#             'django': {
+#                 'handlers': ['file'],
+#                 'level': 'DEBUG',
+#                 'propagate': True,
+#             },
+#             # You can also define custom loggers for your applications
+#             'my_app': {
+#                 'handlers': ['file'],
+#                 'level': 'INFO',
+#                 'propagate': False, # Set to False to prevent propagation to parent loggers
+#             },
+#         },
+#     }

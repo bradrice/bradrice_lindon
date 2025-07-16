@@ -7,13 +7,14 @@ import stripe
 from dotenv import load_dotenv
 import os
 
-load_dotenv() # Load environment variables from .env
+ENV = os.getenv('DJANGO_ENV', 'development')
+
+load_dotenv(dotenv_path=f'.env.{ENV}') # Load development environment variables from .env
 # Create your views here.
 
-if (os.getenv('DJANGO_ENV') == "production"):
-    default_irpin_book_price_id = os.getenv('IRPIN_BOOKLET_PRICE_PROD')
-else:
-    default_irpin_book_price_id = os.getenv('IRPIN_BOOKLET_PRICE_DEV')
+default_irpin_book_price_id = os.getenv('IRPIN_BOOKLET_PRICE')
+irpin_shipping_id = os.getenv('IRPIN_BOOKLET_SHIPPING_ID')
+irpin_product_id = os.getenv('IRPIN_PRODUCT_ID')
 
 
 class PaymentsPageView(TemplateView):
@@ -30,7 +31,8 @@ def stripe_config(request):
 @csrf_exempt
 def checkout_view(request):
     if request.method == 'POST':
-       price_id = request.POST.get('price_id')
+       # price_id = request.POST.get('price_id')
+       price_id = "price_1RjhFyHr3XrGP7sjocSQhToz"
        product_id = request.POST.get('product_id')
        domain_url = 'https://dev.bradrice.com/'
        stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -42,14 +44,16 @@ def checkout_view(request):
 def create_checkout_session(request):
     # print("inside checkout session")
     if request.method == 'POST':
-        price_id = request.POST.get('price_id')
-        product_id = request.POST.get('product_id')
+        price_id = default_irpin_book_price_id
+            # price_id = request.POST.get('price_id')
+        product_type = request.POST.get('product_type')
         unit_price = request.POST.get('price')
         title = request.POST.get('title')
         domain_url = 'https://dev.bradrice.com/'
         stripe.api_key = settings.STRIPE_SECRET_KEY
 
         try:
+            # return HttpResponse(product_type)
             # Create new Checkout Session for the order
             # Other optional params include:
             # [billing_address_collection] - to display billing address details on the page
@@ -59,12 +63,18 @@ def create_checkout_session(request):
             # For full details see https://stripe.com/docs/api/checkout/sessions/create
 
             # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
-            if (price_id == default_irpin_book_price_id):
+            if (product_type == "irpin"):
                 checkout_session = stripe.checkout.Session.create(
                     success_url=domain_url + 'payments/success?session_id={CHECKOUT_SESSION_ID}',
                     cancel_url=domain_url + 'payments/cancelled/',
                     payment_method_types=['card'],
                     mode='payment',
+                    shipping_address_collection={"allowed_countries": ["US", "CA"]},
+                    shipping_options=[
+                        {
+                            'shipping_rate': irpin_shipping_id, # Replace with your shipping rate ID
+                        },
+                    ],
                     line_items=[
                         {
                             'quantity': 1,
@@ -82,6 +92,7 @@ def create_checkout_session(request):
                     cancel_url=domain_url + 'payments/cancelled/',
                     payment_method_types=['card'],
                     mode='payment',
+                    shipping_address_collection={"allowed_countries": ["US", "CA"]},
                     line_items = [
                         {
                         'price_data' : {
