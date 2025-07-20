@@ -79,6 +79,7 @@ def create_checkout_session(request):
                         {
                             'quantity': 1,
                             'price': price_id,
+                            "adjustable_quantity": {"enabled": True, "minimum": 1, "maximum": 10},
                         }
                     ]
                 )
@@ -86,6 +87,8 @@ def create_checkout_session(request):
                 return HttpResponseRedirect(checkout_session.url)
 
             else:
+                product_id = os.getenv('ART_PRODUCT_ID')
+                price_id = os.getenv('STRIPE_ARTWORK_PRICE ')
                 unit_price = int(float(unit_price))
                 checkout_session = stripe.checkout.Session.create(
                     success_url=domain_url + 'payments/success?session_id={CHECKOUT_SESSION_ID}',
@@ -96,7 +99,7 @@ def create_checkout_session(request):
                     line_items = [
                         {
                         'price_data' : {
-                            'product': product_id,
+                            'price': price_id,
                             'unit_amount': unit_price * 100,
                             'currency': 'usd',
                             'product_data': {
@@ -147,5 +150,6 @@ def stripe_webhook(request):
     if event['type'] == 'checkout.session.completed':
         print("Payment was successful.")
         # TODO: run some custom code here
+        send_mail("artwork sold", "this artwork sold on your website", 'admin@oh-joy.org', ["bradrice1@gmail.com"])
 
     return HttpResponse(status=200)

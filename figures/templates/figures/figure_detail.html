@@ -13,6 +13,7 @@
 </div>
 <p>{{ page.body |richtext}}</p>
 <div>
+  {% if page.for_sale %}
 <form method="post" action="/payments/create-checkout-session/"
 <input type="hidden" name="product_id" value="prod_I0Ct56Y4YvHQwT"/>
 <input type="hidden" name="price" value="{{ page.price}}"/>
@@ -20,6 +21,7 @@
 <input type="hidden" name="title" value="{{ page.title}}"/>
 <button type="submit" class="btn btn-primary">Purchase</button>
 </form>
+{% endif %}
 </div>
 </div>
 {% endblock %}

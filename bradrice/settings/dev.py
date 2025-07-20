@@ -15,8 +15,7 @@ load_dotenv(dotenv_path=f'.env.{DJANGO_ENV}')
 
 STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
-STRIPE_ENDPONT_SECRET = os.getenv('STRIPE_ENDPONT_SECRET')
-
+STRIPE_ENDPOINT_SECRET = os.getenv('STRIPE_ENDPOINT_SECRET')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 

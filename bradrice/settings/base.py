@@ -14,7 +14,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
-if os.environ.get('APP_ENV') == 'production':
+if os.environ.get('DJANGO_ENV') == 'production':
     load_dotenv(dotenv_path='.env.production')
 else:
     load_dotenv(dotenv_path='.env.development')

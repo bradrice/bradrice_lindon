@@ -5,7 +5,7 @@ load_dotenv() # Load environment variables from .env
 
 from .base import *
 
-if os.getenv('DJANGO_ENV') == 'development':
+if os.getenv('DJANGO_ENV') == 'production':
     from .prod import *
 else:
     from .dev import *
