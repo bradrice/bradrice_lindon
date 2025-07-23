@@ -17,7 +17,7 @@ DEBUG = False
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # Add your site's domain name(s) here.
-ALLOWED_HOSTS = ["dev.bradrice.com", "bradrice.com"]
+ALLOWED_HOSTS = ["dev.bradrice.com", "bradrice.com", "www.bradrice.com"]
 
 # To send email from the server, we recommend django_sendmail_backend
 # Or specify your own email backend such as an SMTP server.
@@ -29,7 +29,7 @@ DEFAULT_FROM_EMAIL = "Brad Rice <info@bradrice.com>"
 
 # A list of people who get error notifications.
 ADMINS = [
-    ("Administrator", "admin@bradrice.com"),
+    ("Administrator", "bradrice1@gmail.com"),
 ]
 
 # A list in the same format as ADMINS that specifies who should get broken link
