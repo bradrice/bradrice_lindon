@@ -198,7 +198,7 @@ WAGTAILADMIN_BASE_URL = "http://bradrice.com"
 #anymail
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
-DEFAULT_FROM_EMAIL = "bra@bradrice.com"
+DEFAULT_FROM_EMAIL = "brad@bradrice.com"
 SERVER_EMAIL = "admin@oh-joy.org"
 MANAGERS = ADMINS
 ANYMAIL = {

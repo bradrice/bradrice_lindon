@@ -1,5 +1,6 @@
 from .base import *  # noqa
 from dotenv import load_dotenv
+import logging
 import os
 
 # Determine the environment (e.g., 'development', 'production')
@@ -37,28 +38,83 @@ try:
 except ImportError:
     pass
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'file': {
-                'level': 'DEBUG',
-                'class': 'logging.FileHandler',
-                'filename': '/var/www/webapps/bradrice/log/django_app.log', # Specify the path to your log file
-            },
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'success_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/www/webapps/dev.bradrice/log/django_success.log',
+            # 'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            # 'backupCount': 5,
+            'formatter': 'verbose',
         },
-        'loggers': {
-            'django': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
-            },
-            # You can also define custom loggers for your applications
-            'bradrice': {
-                'handlers': ['file'],
-                'level': 'INFO',
-                'propagate': False, # Set to False to prevent propagation to parent loggers
-            },
+        'error_file': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/var/www/webapps/dev.bradrice/log/django_error.log',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'verbose',
         },
-    }
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'loggers': {
+        'django': {  # Custom logger for success messages
+            'handlers': ['success_file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.error': {  # Custom logger for error messages
+            'handlers': ['error_file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django.request': {  # Custom logger for success messages
+            'handlers': ['success_file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+
+
+# LOGGING = {
+#         'version': 1,
+#         'disable_existing_loggers': False,
+#         'formatters': {
+#             'verbose': {
+#                 'format': '%(levelname)s %(asctime)s %(module)s %(message)s'
+#             },
+#         },
+#         'handlers': {
+#             'file': {
+#                 'level': 'DEBUG',
+#                 'class': 'logging.FileHandler',
+#                 'formatter': 'verbose',
+#                 'filename': '/var/www/webapps/dev.bradrice/log/django_app.log', # Specify the path to your log file
+#             },
+#         },
+#         'loggers': {
+#             'django': {
+#                 'handlers': ['file'],
+#                 'level': 'DEBUG',
+#                 'propagate': True,
+#             },
+#             # You can also define custom loggers for your applications
+#             'bradrice': {
+#                 'handlers': ['file'],
+#                 'level': 'INFO',
+#                 'propagate': False, # Set to False to prevent propagation to parent loggers
+#             },
+#         },
+#     }

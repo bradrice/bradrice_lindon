@@ -4,7 +4,10 @@ from wagtail.fields import RichTextField
 from wagtail.admin.panels import FieldPanel
 from wagtail.images import get_image_model
 from dotenv import load_dotenv
+import logging
 import os
+
+logger = logging.getLogger(__name__)
 
 load_dotenv() # Load environment variables from .env
 
@@ -24,6 +27,9 @@ class FigureIndex(Page):
         FieldPanel("subtitle"),
         FieldPanel("body"),
     ]
+
+    def get(self, request, *args, **kwargs):
+        logger.info("Get request in Figure Index.")
 
     def get_context(self, request):
         context = super().get_context(request)

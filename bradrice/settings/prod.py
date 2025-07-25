@@ -29,7 +29,7 @@ DEFAULT_FROM_EMAIL = "Brad Rice <info@bradrice.com>"
 
 # A list of people who get error notifications.
 ADMINS = [
-    ("Administrator", "admin@bradrice.com"),
+    ("Administrator", "bradrice1@gmail.com"),
 ]
 
 # A list in the same format as ADMINS that specifies who should get broken link
@@ -48,27 +48,27 @@ CACHES = {
     }
 }
 
-# LOGGING = {
-#         'version': 1,
-#         'disable_existing_loggers': False,
-#         'handlers': {
-#             'file': {
-#                 'level': 'DEBUG',
-#                 'class': 'logging.FileHandler',
-#                 'filename': '/path/to/your/django_app.log', # Specify the path to your log file
-#             },
-#         },
-#         'loggers': {
-#             'django': {
-#                 'handlers': ['file'],
-#                 'level': 'DEBUG',
-#                 'propagate': True,
-#             },
-#             # You can also define custom loggers for your applications
-#             'my_app': {
-#                 'handlers': ['file'],
-#                 'level': 'INFO',
-#                 'propagate': False, # Set to False to prevent propagation to parent loggers
-#             },
-#         },
-#     }
+LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '/var/www/webapps/dev.bradrice/log/django_app.log', # Specify the path to your log file
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+            # You can also define custom loggers for your applications
+            'my_app': {
+                'handlers': ['file'],
+                'level': 'INFO',
+                'propagate': False, # Set to False to prevent propagation to parent loggers
+            },
+        },
+    }

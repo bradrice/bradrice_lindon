@@ -1,5 +1,6 @@
 from django.conf import settings  # new
 from django.http.response import JsonResponse, HttpResponse, HttpResponseRedirect
+from django.core.mail import send_mail
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateView
 import stripe
@@ -112,6 +113,7 @@ def create_checkout_session(request):
                 ),
                 # return JsonResponse(checkout_session, safe=False)
 
+
                 return HttpResponseRedirect(checkout_session[0].url)
 
             # return JsonResponse({'sessionId': checkout_session['id']})
@@ -148,8 +150,7 @@ def stripe_webhook(request):
 
     # Handle the checkout.session.completed event
     if event['type'] == 'checkout.session.completed':
-        print("Payment was successful.")
         # TODO: run some custom code here
         send_mail("artwork sold", "this artwork sold on your website", 'admin@oh-joy.org', ["bradrice1@gmail.com"])
-
+    #
     return HttpResponse(status=200)

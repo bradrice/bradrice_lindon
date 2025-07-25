@@ -6,7 +6,10 @@ from django.contrib import admin
 from django.urls import include
 from django.urls import path
 from wagtail.documents import urls as wagtaildocs_urls
+import logging
 
+logger = logging.getLogger('tuna')
+logger.debug("This is a debug message")
 
 urlpatterns = [
     # Admin

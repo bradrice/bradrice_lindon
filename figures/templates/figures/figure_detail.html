@@ -1,6 +1,16 @@
 {% extends "coderedcms/pages/web_page.html" %}
 {% load wagtailcore_tags wagtailimages_tags coderedcms_tags %}/website/templates/coderedcms/pages/base.html" %}
 
+{% block custom_assets %}
+{{ block.super }}
+<meta property="og:title" content="{{ page.title }}" />
+<meta property="og:description" content="{{page.description}}" />
+{% image page.image width-400 as tmp_photo %}
+<meta property="og:image" content="{{ tmp_photo.full_url }}" />
+<meta property="og:url" content="{{ page.url }}" />
+<meta property="og:type" content="article" />
+{% endblock %}
+
 {% block content %}
 <div class="container">
 <h1>{{ page.title }}</h1>
