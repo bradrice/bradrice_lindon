@@ -1,8 +1,11 @@
 from django.db import models
 from wagtail.models import Page
 from wagtail.fields import RichTextField
-from wagtail.admin.panels import FieldPanel
+from wagtail.admin.panels import FieldPanel, InlinePanel
 from wagtail.images import get_image_model
+from wagtail.images.blocks import ImageChooserBlock
+from wagtail import blocks
+from modelcluster.fields import ParentalKey
 from dotenv import load_dotenv
 import os
 
@@ -57,8 +60,19 @@ class FigureDetail(Page):
         FieldPanel('image'),
         FieldPanel('price'),
         FieldPanel('stripe_price_id'),
-        FieldPanel('for_sale')
+        FieldPanel('for_sale'),
+        InlinePanel('gallery_images', label='Gallery Images'),
 
     ]
 
-# Create your models here.
+class MyPageGalleryImage(models.Model):
+    page = ParentalKey(FigureDetail, on_delete=models.CASCADE, related_name='gallery_images')
+    image = models.ForeignKey(
+        get_image_model(), on_delete=models.CASCADE, related_name='+'
+    )
+    caption = models.CharField(blank=True, max_length=250)
+
+    panels = [
+        FieldPanel('image'),
+        FieldPanel('caption'),
+    ]

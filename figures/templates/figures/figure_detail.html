@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
 <h1>{{ page.title }}</h1>
-{% if page.gallery_number is not None %}
+  {% if page.gallery_number is not None %} {( page.pk)}
 <h4>Gallery number - {{page.gallery_number}}</h4>
 {% endif %}
 <h2>{{ page.subtitle }}</h2>
@@ -20,6 +20,8 @@
 <input type="hidden" name="price" value="{{ page.price}}"/>
 <input type="hidden" name="price_id" value="{{ page.stripe_price_id}}"/>
 <input type="hidden" name="title" value="{{ page.title}}"/>
+<input type="hidden" name="image" value="{{ page.image }}"/>
+<input type="hidden" name="product_id" value="{{ page.pk }}"/>
 <button type="submit" class="btn btn-primary">Purchase</button>
 </form>
 {% endif %}

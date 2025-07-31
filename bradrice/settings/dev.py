@@ -38,27 +38,27 @@ except ImportError:
     pass
 
 
-LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'file': {
-                'level': 'DEBUG',
-                'class': 'logging.FileHandler',
-                'filename': '/var/www/webapps/bradrice/log/django_app.log', # Specify the path to your log file
-            },
-        },
-        'loggers': {
-            'django': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
-            },
-            # You can also define custom loggers for your applications
-            'bradrice': {
-                'handlers': ['file'],
-                'level': 'INFO',
-                'propagate': False, # Set to False to prevent propagation to parent loggers
-            },
-        },
-    }
+# LOGGING = {
+#         'version': 1,
+#         'disable_existing_loggers': False,
+#         'handlers': {
+#             'file': {
+#                 'level': 'DEBUG',
+#                 'class': 'logging.FileHandler',
+#                 'filename': '/var/www/webapps/bradrice/log/django_app.log', # Specify the path to your log file
+#             },
+#         },
+#         'loggers': {
+#             'django': {
+#                 'handlers': ['file'],
+#                 'level': 'DEBUG',
+#                 'propagate': True,
+#             },
+#             # You can also define custom loggers for your applications
+#             'bradrice': {
+#                 'handlers': ['file'],
+#                 'level': 'INFO',
+#                 'propagate': False, # Set to False to prevent propagation to parent loggers
+#             },
+#         },
+#     }

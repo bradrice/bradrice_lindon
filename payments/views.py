@@ -2,6 +2,8 @@ from django.conf import settings  # new
 from django.http.response import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateView
+from figures.models import FigureDetail
+from wagtail.images.models import Image
 import stripe
 
 from dotenv import load_dotenv
@@ -34,7 +36,7 @@ def checkout_view(request):
        # price_id = request.POST.get('price_id')
        price_id = "price_1RjhFyHr3XrGP7sjocSQhToz"
        product_id = request.POST.get('product_id')
-       domain_url = 'https://dev.bradrice.com/'
+       domain_url = request.build_absolute_uri('/')
        stripe.api_key = settings.STRIPE_SECRET_KEY
        return HttpResponse(staus=200)
 
@@ -42,14 +44,17 @@ def checkout_view(request):
 
 @csrf_exempt
 def create_checkout_session(request):
+    product = FigureDetail.objects.get(id=request.POST.get('product_id'))
     # print("inside checkout session")
+    image = request.POST.get('image')
+    image_url = Image.get_rendition(product.image, 'width-360').url if product.image else None
     if request.method == 'POST':
         price_id = default_irpin_book_price_id
             # price_id = request.POST.get('price_id')
         product_type = request.POST.get('product_type')
         unit_price = request.POST.get('price')
         title = request.POST.get('title')
-        domain_url = 'https://dev.bradrice.com/'
+        domain_url = request.build_absolute_uri('/')
         stripe.api_key = settings.STRIPE_SECRET_KEY
 
         try:
@@ -104,6 +109,10 @@ def create_checkout_session(request):
                             'currency': 'usd',
                             'product_data': {
                             'name': title,
+                            'images': [f"{domain_url}{image_url}"],
+                            'metadata': {
+                                'product_id':  product_id,  # Pass the primary key of the artwork
+                            }
                             },
                         },
                         'quantity': 1,
@@ -150,6 +159,6 @@ def stripe_webhook(request):
     if event['type'] == 'checkout.session.completed':
         print("Payment was successful.")
         # TODO: run some custom code here
-        send_mail("artwork sold", "this artwork sold on your website", 'admin@oh-joy.org', ["bradrice1@gmail.com"])
+        # send_mail("artwork sold", "this artwork sold on your website", 'admin@oh-joy.org', ["bradrice1@gmail.com"])
 
     return HttpResponse(status=200)

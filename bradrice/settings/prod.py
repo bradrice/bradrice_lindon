@@ -48,27 +48,3 @@ CACHES = {
     }
 }
 
-# LOGGING = {
-#         'version': 1,
-#         'disable_existing_loggers': False,
-#         'handlers': {
-#             'file': {
-#                 'level': 'DEBUG',
-#                 'class': 'logging.FileHandler',
-#                 'filename': '/path/to/your/django_app.log', # Specify the path to your log file
-#             },
-#         },
-#         'loggers': {
-#             'django': {
-#                 'handlers': ['file'],
-#                 'level': 'DEBUG',
-#                 'propagate': True,
-#             },
-#             # You can also define custom loggers for your applications
-#             'my_app': {
-#                 'handlers': ['file'],
-#                 'level': 'INFO',
-#                 'propagate': False, # Set to False to prevent propagation to parent loggers
-#             },
-#         },
-#     }
