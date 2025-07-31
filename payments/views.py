@@ -44,11 +44,9 @@ def checkout_view(request):
 
 @csrf_exempt
 def create_checkout_session(request):
-    product = FigureDetail.objects.get(id=request.POST.get('product_id'))
     # print("inside checkout session")
-    image = request.POST.get('image')
-    image_url = Image.get_rendition(product.image, 'width-360').url if product.image else None
     if request.method == 'POST':
+        image = request.POST.get('image')
         price_id = default_irpin_book_price_id
             # price_id = request.POST.get('price_id')
         product_type = request.POST.get('product_type')
@@ -92,6 +90,8 @@ def create_checkout_session(request):
                 return HttpResponseRedirect(checkout_session.url)
 
             else:
+                product = FigureDetail.objects.get(id=request.POST.get('product_id'))
+                image_url = Image.get_rendition(product.image, 'width-360').url if product.image else None
                 product_id = os.getenv('ART_PRODUCT_ID')
                 price_id = os.getenv('STRIPE_ARTWORK_PRICE ')
                 unit_price = int(float(unit_price))
