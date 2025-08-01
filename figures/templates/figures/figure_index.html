@@ -3,21 +3,21 @@
 
 
 {% block content %}
-<div class="container">
+<div class="container crx-grid">
 <h2>Art work</h2>
 <p>{{ page.subtitle }}</p>
-<div class="col-12">
 {% for figure in figure_entries %}
 <div class="row">
-<div class="figureblock col">
-  <h2>{% if figure.gallery_number is not None %}{{figure.gallery_number}} - {% endif %}{{ figure.title }}</h2>
+<div class="figureblock col-sm-12 col-md-6">
+  <h2>{{ figure.title }}</h2>
   <a href="{{ figure.url }}">Read More</a>
 </div>
-<div class="figureblock col">
-  {% image figure.image width-400 %}
+<div class="figureblock col-sm-12 col-md-6">
+  {% image figure.image width-300 %}
   </div>
   </div>
 {% endfor %}
 </div>
+    </div>
 </div>
 {% endblock %}

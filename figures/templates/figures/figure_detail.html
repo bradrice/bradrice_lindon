@@ -5,15 +5,20 @@
 {% block content %}
 <div class="container">
 <h1>{{ page.title }}</h1>
-  {% if page.gallery_number is not None %} {( page.pk)}
-<h4>Gallery number - {{page.gallery_number}}</h4>
-{% endif %}
 <h2>{{ page.subtitle }}</h2>
 <div class="figure">
   {% srcset_image page.image width-{360,780,1000} sizes="(max-width: 480px) 800px, 80vw" %}
 </div>
 <p>{{ page.body |richtext}}</p>
 <div>
+    {% if gallery_images|length > 0 %}
+    <h3>Additional views</h3>
+     {% for img in gallery_images %}
+<div class="figure">
+  {% srcset_image img.image width-{360,780,1000} sizes="(max-width: 480px) 800px, 80vw" %}
+</div>
+    {% endfor %}
+    {% endif %}
   {% if page.for_sale %}
 <form method="post" action="/payments/create-checkout-session/"
 <input type="hidden" name="product_id" value="prod_I0Ct56Y4YvHQwT"/>

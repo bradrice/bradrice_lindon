@@ -11,10 +11,7 @@ import os
 
 load_dotenv() # Load environment variables from .env
 
-if (os.getenv('DJANGO_ENV') == "production"):
-    default_artwork_price_id = os.getenv('STRIPE_ARTWORK_PRICE_PROD ')
-else:
-    default_artwork_price_id = os.getenv('STRIPE_ARTWORK_PRICE_DEV')
+default_artwork_price_id = os.getenv('STRIPE_ARTWORK_PRICE')
 
 
 class FigureIndex(Page):
@@ -37,7 +34,7 @@ class FigureIndex(Page):
 class FigureDetail(Page):
     parent_page_types = ['FigureIndex']
     subtitle = models.CharField(max_length=255, blank=True)
-    gallery_number = models.IntegerField(blank=True, null=True)
+    weight = models.IntegerField(default=0, help_text="Lower number means higher priority in sorting.")
     media_type = models.CharField(max_length=255, blank=True)
     body = RichTextField(blank=True)
     stripe_price_id = models.CharField(blank=True, default=default_artwork_price_id)
@@ -54,7 +51,7 @@ class FigureDetail(Page):
 
     content_panels = Page.content_panels + [
         FieldPanel('subtitle'),
-        FieldPanel('gallery_number'),
+        FieldPanel('weight'),
         FieldPanel('media_type'),
         FieldPanel('body'),
         FieldPanel('image'),
@@ -64,6 +61,19 @@ class FigureDetail(Page):
         InlinePanel('gallery_images', label='Gallery Images'),
 
     ]
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request, *args, **kwargs)
+        context['gallery_images'] = self.gallery_images.all()
+        return context
+
+    class Meta:
+        # Define the default ordering for queries on this model
+        # Products with lower 'weight' values will appear first
+        ordering = ['weight', 'title'] # You can add other fields for secondary sorting
+
+    def __str__(self):
+        return self.title
+
 
 class MyPageGalleryImage(models.Model):
     page = ParentalKey(FigureDetail, on_delete=models.CASCADE, related_name='gallery_images')
