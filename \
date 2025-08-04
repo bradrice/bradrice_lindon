@@ -2,17 +2,18 @@
 {% load wagtailcore_tags wagtailimages_tags coderedcms_tags %}
 
 {% block frontend_assets %}
+{% image page.image width-360 as my_image %}
 
-<meta property="og:title" content="{{page.title}}" />
-<meta property="og:description" content="{{page.subtitle}}" />
-<meta property="og:site_name" content="Brad Rice Artwork" />
-<meta property="og:url" content="request.path" />
+<meta property="og:title" content="Home — Brad Rice" />
+<meta property="og:description" content="" />
+<meta property="og:site_name" content="Brad Rice" />
+<meta property="og:url" content="http://bradrice.com/" />
 <meta property="og:type" content="website" />
-<meta property="og:image" content={{image_url}} />
-<meta name="twitter:card" content="Brad Rice artwork" />
-<meta name="twitter:title" content="{{ page.title }}" />
-<meta name="twitter:image" content={{image_url}}  />
-<meta name="twitter:description" content="{{page.subtitle}}"/>
+{# <meta property="og:image" content="{% image page.image width-360 %}.url" /> #}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Home — Brad Rice" />
+{# <meta name="twitter:image" content="{% my_image.url %}" /> #}
+<meta name="twitter:description" content=""/>
 <meta name="twitter:site" content="@" />
 {% endblock %}
 {% block content %}

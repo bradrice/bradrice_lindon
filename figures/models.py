@@ -3,6 +3,7 @@ from wagtail.models import Page
 from wagtail.fields import RichTextField
 from wagtail.admin.panels import FieldPanel, InlinePanel
 from wagtail.images import get_image_model
+from wagtail.images.models import Image
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail import blocks
 from modelcluster.fields import ParentalKey
@@ -28,6 +29,7 @@ class FigureIndex(Page):
     def get_context(self, request):
         context = super().get_context(request)
         context['figure_entries'] = FigureDetail.objects.live().descendant_of(self)
+
         return context
 
 
@@ -64,6 +66,8 @@ class FigureDetail(Page):
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
         context['gallery_images'] = self.gallery_images.all()
+        image_url = Image.get_rendition(self.image, 'width-360').url if self.image else None
+        context['image_url'] = domain_url = request.build_absolute_uri('/') + image_url if image_url else None
         return context
 
     class Meta:
