@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateView
 from figures.models import FigureDetail
 from wagtail.images.models import Image
+import json
 import stripe
 
 from dotenv import load_dotenv
@@ -99,6 +100,16 @@ def create_checkout_session(request):
                     success_url=domain_url + 'payments/success?session_id={CHECKOUT_SESSION_ID}',
                     cancel_url=domain_url + 'payments/cancelled/',
                     payment_method_types=['card'],
+                    metadata={
+                        'product_id': product.id,
+                        'product_name': product.title,
+                    },
+                    payment_intent_data = {
+                        'metadata':{
+                        'product_name': product.title,
+                        'product_id': product.id,
+                        }
+                    },
                     mode='payment',
                     shipping_address_collection={"allowed_countries": ["US", "CA"]},
                     line_items = [
@@ -110,9 +121,6 @@ def create_checkout_session(request):
                             'product_data': {
                             'name': title,
                             'images': [f"{domain_url}{image_url}"],
-                            'metadata': {
-                                'product_id':  product_id,  # Pass the primary key of the artwork
-                            }
                             },
                         },
                         'quantity': 1,
@@ -141,7 +149,7 @@ def stripe_webhook(request):
     stripe.api_key = settings.STRIPE_SECRET_KEY
     endpoint_secret = settings.STRIPE_ENDPOINT_SECRET
     payload = request.body
-    # sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
     event = None
 
     try:
@@ -156,8 +164,19 @@ def stripe_webhook(request):
         return HttpResponse(status=400)
 
     # Handle the checkout.session.completed event
-    if event['type'] == 'checkout.session.completed':
-        print("Payment was successful.")
+    if event.type == 'payment_intent.succeeded':
+        print('PaymentIntent was successful!')
+
+    elif event['type'] == 'checkout.session.completed':
+        session = event.data.object # contains a stripe.PaymentIntent
+        metadata = session['metadata']
+        # print("Payment was successful.")
+        # print(json.dumps(session, indent=2))
+        objectid = metadata.get('product_id')
+        product = FigureDetail.objects.get(pk=objectid)
+        product.for_sale = False
+        product.save()
+
         # TODO: run some custom code here
         # send_mail("artwork sold", "this artwork sold on your website", 'admin@oh-joy.org', ["bradrice1@gmail.com"])
 
