@@ -42,6 +42,7 @@ class FigureDetail(Page):
     stripe_price_id = models.CharField(blank=True, default=default_artwork_price_id)
     price = models.DecimalField(blank=True, default="20.00", max_digits=10, decimal_places=2)
     for_sale = models.BooleanField(default=False)
+    sold = models.BooleanField(default=False)
     image = models.ForeignKey(
         get_image_model(),
         null=True,
@@ -60,6 +61,7 @@ class FigureDetail(Page):
         FieldPanel('price'),
         FieldPanel('stripe_price_id'),
         FieldPanel('for_sale'),
+        FieldPanel('sold'),
         InlinePanel('gallery_images', label='Gallery Images'),
 
     ]

@@ -175,6 +175,7 @@ def stripe_webhook(request):
         objectid = metadata.get('product_id')
         product = FigureDetail.objects.get(pk=objectid)
         product.for_sale = False
+        product.sold = True
         product.save()
 
         # TODO: run some custom code here
