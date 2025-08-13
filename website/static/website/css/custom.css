@@ -12641,3 +12641,25 @@ h2[data-block-key], [data-block-key].h2, h3[data-block-key], [data-block-key].h3
 .figureblock {
   margin-bottom: 1em;
 }
+
+#content {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container-flex {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  left: 1em;
+  right: 1em;
+  border-top: 1px solid #333;
+  width: 100%;
+}

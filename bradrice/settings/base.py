@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "custom_user",
     "payments.apps.PaymentsConfig",
     "figures",
+    "blogpages",
     "anymail",
     # Wagtail CRX (CodeRed Extensions)
     "coderedcms",

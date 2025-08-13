@@ -1,0 +1,23 @@
+{% extends "coderedcms/pages/web_page.html" %}
+{% load wagtailcore_tags wagtailimages_tags coderedcms_tags %}/website/templates/coderedcms/pages/base.html" %}
+
+
+{% block content %}
+<div class="container crx-grid">
+<h2>Irpin's hangout</h2>
+<p>{{ page.subtitle }}</p>
+{% for post in blog_posts %}
+<div class="row">
+<div class="figureblock col-sm-12 col-md-6">
+  <h2>{{ post.title }}</h2>
+  <a href="{{ post.url }}">Read More</a>
+</div>
+<div class="figureblock col-sm-12 col-md-6">
+  {% image post.image width-300 %}
+  </div>
+  </div>
+{% endfor %}
+</div>
+    </div>
+</div>
+{% endblock %}

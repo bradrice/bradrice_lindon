@@ -63,3 +63,24 @@
 .figureblock {
   margin-bottom: 1em;
 }
+
+#content {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container-flex {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  left: 1em;
+  border-top: 1px solid #555;
+  width: 100%;
+}
