@@ -25,6 +25,41 @@
 @import "coderedcms/scss/crx-richtext";
 
 // Add your custom styles here.
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.figureblock {
+  margin-bottom: 1em;
+}
+
+#content {
+  display: flex;
+  flex-direction: column;
+}
+
+.container-flex {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+footer {
+  display: flex;
+  padding-left: 1em;
+  border-top: 1px solid #555;
+  width: 100%;
+}
+
+.figure_body {
+  max-width: 900px;
+}
+
+.published-date {
+  color: #999;
+}
 
 // Adds a bit of spacing to "Responsive Grid Row" blocks.
 .crx-grid {
@@ -58,29 +93,4 @@
     margin: 0 auto;
     padding: 0 15px;
   }
-}
-
-.figureblock {
-  margin-bottom: 1em;
-}
-
-#content {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.container-flex {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-footer {
-  position: absolute;
-  bottom: 0;
-  display: flex;
-  left: 1em;
-  border-top: 1px solid #555;
-  width: 100%;
 }

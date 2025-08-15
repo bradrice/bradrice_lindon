@@ -15,20 +15,40 @@
 <meta name="twitter:site" content="@" />
 {% endblock %}
 {% block content %}
-<div class="container container-flex">
+<div class="container crx-grid">
+  <div class="post-head">
 <h1>{{ page.title }}</h1>
 <h2>{{ page.subtitle }}</h2>
+  <p>By Irpin
+  <span class="published-date">{{ page.first_published_at | date:"F d, Y" }}</span>
+      </p>
+  </div>
 <div class="figure">
   {% srcset_image page.image width-{360,780,1000} sizes="(max-width: 480px) 800px, 80vw" %}
 </div>
-<div class="container container-flex">
 <div class="row">
     <div class="col">
-        <small>{{ page.first_published_at | date:"F d, Y" }}</small>
-<p>{{ page.body | richtext}}</p>
-
+      {% for block in page.body %}
+      {% if block.block_type == 'text' %}
+      {{ block.value }}
+      {% elif block.block_type == 'image' %}
+<div class="figure">
+  {% srcset_image block.value width-{360,780,1000} sizes="(max-width: 480px) 800px, 80vw" %}
+</div>
+      {% endif %}
+      {% endfor %}
     </div>
-  </div>
+    <div class="row">
+      <div class="col">
+<div class="post-cta">
 <a href="/irpins-big-blog">Return to my blog home</a>
+          <p style="margin-top: .5em;">
+<a href="/irpins-big-adventure/" class="btn btn-primary">Get the book</a>
+          </p>
+    </div>
+
+      </div>
+    </div>
+
 </div>
 {% endblock content %}
