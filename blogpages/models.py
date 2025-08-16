@@ -1,13 +1,13 @@
 from django.db import models
-from wagtail.models import Page
+from wagtail.models import Page, Orderable
 from wagtail.fields import RichTextField, StreamField
 from wagtail.admin.panels import FieldPanel, InlinePanel
 from wagtail.images import get_image_model
 from wagtail.images.models import Image
 from wagtail.images.blocks import ImageChooserBlock
-from wagtail import blocks
 from wagtail.blocks import RichTextBlock
 from modelcluster.fields import ParentalKey
+from wagtail.snippets.blocks import SnippetChooserBlock
 
 class BlogIndex(Page):
     template = 'blogpages/blog_index.html'
@@ -33,6 +33,14 @@ class BlogPost(Page):
     parent_page_types = ['BlogIndex']
     subpage_types = []
     subtitle = models.CharField(max_length=255, blank=True)
+    author = models.ForeignKey(
+          'blogpages.Author',
+          null=True,
+          blank=True,
+          on_delete=models.SET_NULL,
+          related_name='+'
+      )
+
     body = StreamField(
         [
         ('text', RichTextBlock()),
@@ -57,6 +65,7 @@ class BlogPost(Page):
 
     content_panels = Page.content_panels + [
         FieldPanel('subtitle'),
+        FieldPanel('author'),
         FieldPanel('image'),
         FieldPanel('body'),
         # FieldPanel('categories'),
