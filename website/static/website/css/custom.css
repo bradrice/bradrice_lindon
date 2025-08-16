@@ -12623,11 +12623,12 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
+  margin-bottom: 1em;
 }
 
 footer {
   display: flex;
-  left: 1em;
+  padding-left: 1em;
   border-top: 1px solid #555;
   width: 100%;
 }
