@@ -1,6 +1,5 @@
 {% extends "coderedcms/pages/web_page.html" %}
-{% load wagtailcore_tags wagtailimages_tags coderedcms_tags %}
-
+{% load wagtailcore_tags wagtailimages_tags coderedcms_tags currency_filters %}
 {% block frontend_assets %}
 
 <meta property="og:title" content="{{page.title}}" />
@@ -33,6 +32,7 @@
     {% endfor %}
     {% endif %}
   {% if page.for_sale %}
+    <p>Price: {{page.price | currency}}</p>
 <form method="post" action="/payments/create-checkout-session/"
 <input type="hidden" name="product_id" value="prod_I0Ct56Y4YvHQwT"/>
 <input type="hidden" name="price" value="{{ page.price}}"/>
