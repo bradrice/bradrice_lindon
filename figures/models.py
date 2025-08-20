@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from wagtail.models import Page
 from wagtail.fields import RichTextField
 from wagtail.admin.panels import FieldPanel, InlinePanel
@@ -28,8 +29,22 @@ class FigureIndex(Page):
 
     def get_context(self, request):
         context = super().get_context(request)
-        context['figure_entries'] = FigureDetail.objects.live().descendant_of(self)
+        all_figures = FigureDetail.objects.live().descendant_of(self)
+        # Pagination
+        paginator = Paginator(all_figures, 1)
+        page = request.GET.get('page')
+        try:
+            # If the page exists and the ?page=x is an int
+            figures = paginator.page(page)
+        except PageNotAnInteger:
+            # If the ?page=x is not an int; show the first page
+            figuree = paginator.page(1)
+        except EmptyPage:
+            # If the ?page=x is out of range (too high most likely)
+            # Then return the last page
+            figures = paginator.page(paginator.num_pages)
 
+        context['figures'] = figures
         return context
 
 
@@ -51,6 +66,32 @@ class FigureDetail(Page):
         related_name='+'
     )
 
+    CHOICE_A = 'Acrylic'
+    CHOICE_B = 'Oil'
+    CHOICE_C = 'Watercolor'
+    CHOICE_D = 'Print'
+    CHOICE_E = 'Graphite'
+    CHOICE_F = 'Pastel'
+
+    MY_CHOICES = [
+        (CHOICE_A, 'Acrylic'),
+        (CHOICE_B, 'Oil'),
+        (CHOICE_C, 'Watercolor'),
+        (CHOICE_D, 'Print'),
+        (CHOICE_E, 'Graphite'),
+        (CHOICE_F, 'Pastel'),
+    ]
+
+    media = models.CharField(
+        max_length=24,
+        choices=MY_CHOICES,
+        default=CHOICE_A,
+    )
+
+    content_panels = Page.content_panels + [
+        FieldPanel('media'),
+    ]
+
 
     content_panels = Page.content_panels + [
         FieldPanel('subtitle'),
@@ -63,6 +104,7 @@ class FigureDetail(Page):
         FieldPanel('for_sale'),
         FieldPanel('sold'),
         InlinePanel('gallery_images', label='Gallery Images'),
+        FieldPanel('media'),
 
     ]
     def get_context(self, request, *args, **kwargs):

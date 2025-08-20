@@ -8,7 +8,6 @@
 /// Bootstrap guide can be found here:
 ///   https://getbootstrap.com/docs/5.3/customize/overview/
 
-
 /// Color system
 ///
 /// For example, if your brand color is neon green (#00ff00), set primary to the
@@ -19,7 +18,7 @@
 ///
 /// See: https://getbootstrap.com/docs/5.3/customize/color/
 
-// $primary:       $blue;
+$primary: #8634eb;
 // $secondary:     $gray-600;
 // $success:       $green;
 // $info:          $cyan;
@@ -28,14 +27,12 @@
 // $light:         $gray-100;
 // $dark:          $gray-900;
 
-
 /// Body
 ///
 /// Settings for the `<body>` element.
 
-// $body-bg:                   $white;
+// $body-bg: #8634eb;
 // $body-color:                $gray-900;
-
 
 /// Typography
 ///

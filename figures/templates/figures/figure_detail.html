@@ -24,7 +24,7 @@
 <p class="figure_body">{{ page.body |richtext}}</p>
 <div>
     {% if gallery_images|length > 0 %}
-    <h3>Additional views</h3>
+    <h2>Additional views</h2>
      {% for img in gallery_images %}
 <div class="figure">
   {% srcset_image img.image width-{360,780,1000} sizes="(max-width: 480px) 800px, 80vw" %}
