@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from wagtail.models import Page, Orderable
 from wagtail.fields import RichTextField, StreamField
 from wagtail.admin.panels import FieldPanel, InlinePanel
@@ -24,7 +25,22 @@ class BlogIndex(Page):
 
     def get_context(self, request):
         context = super().get_context(request)
-        context['blog_posts'] = BlogPost.objects.live().descendant_of(self)
+        all_posts = BlogPost.objects.live().descendant_of(self)
+        # Pagination
+        paginator = Paginator(all_posts, 2)
+        page = request.GET.get('page')
+        try:
+            # If the page exists and the ?page=x is an int
+            posts = paginator.page(page)
+        except PageNotAnInteger:
+            # If the ?page=x is not an int; show the first page
+            posts = paginator.page(1)
+        except EmptyPage:
+            # If the ?page=x is out of range (too high most likely)
+            # Then return the last page
+            posts = paginator.page(paginator.num_pages)
+
+        context['blog_posts'] = posts
         return context
 
 

@@ -31,14 +31,14 @@ class FigureIndex(Page):
         context = super().get_context(request)
         all_figures = FigureDetail.objects.live().descendant_of(self)
         # Pagination
-        paginator = Paginator(all_figures, 1)
+        paginator = Paginator(all_figures, 2)
         page = request.GET.get('page')
         try:
             # If the page exists and the ?page=x is an int
             figures = paginator.page(page)
         except PageNotAnInteger:
             # If the ?page=x is not an int; show the first page
-            figuree = paginator.page(1)
+            figures = paginator.page(1)
         except EmptyPage:
             # If the ?page=x is out of range (too high most likely)
             # Then return the last page

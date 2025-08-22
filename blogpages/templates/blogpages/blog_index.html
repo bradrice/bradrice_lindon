@@ -9,15 +9,49 @@
 {% for post in blog_posts %}
 <div class="row">
 <div class="figureblock col-sm-12 col-md-6">
-  <h2>{{ post.title }}</h2>
-  <a href="{{ post.url }}">Read More</a>
-</div>
-<div class="figureblock col-sm-12 col-md-6">
-  {% image post.image width-300 %}
+  <a href="{{ post.url }}">{% image post.image width-300 %}</a>
   </div>
+<div class="figureblock col-sm-12 col-md-6">
+  <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+  <a href="{{ post.url }}">read more</a>
+</div>
   </div>
 {% endfor %}
 </div>
     </div>
 </div>
+  {% if blog_posts.paginator.num_pages > 1 %}
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="pagination">
+            {% if blog_posts.has_previous %}
+              <li class="page-item">
+                <a href="?page={{ blog_posts.previous_page_number }}" class="page-link">
+                  <span>&laquo;</span>
+                </a>
+              </li>
+            {% endif %}
+
+            {% for page_num in blog_posts.paginator.page_range %}
+              <li class="page-item {% if page_num == blog_posts.number %} active{% endif %}">
+                <a href="?page={{ page_num }}" class="page-link">
+                  {{ page_num }}
+                </a>
+              </li>
+            {% endfor %}
+
+            {% if blog_posts.has_next %}
+              <li class="page-item">
+                <a href="?page={{ blog_posts.next_page_number }}" class="page-link">
+                  <span>&raquo;</span>
+                </a>
+              </li>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
 {% endblock %}
