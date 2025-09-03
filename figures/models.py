@@ -58,7 +58,7 @@ class FigureIndex(Page):
         #     all_figures = all_figures.filter(media=filter_param)
 
         # Pagination
-        paginator = Paginator(figures, 2)
+        paginator = Paginator(figures, 6)
         page = request.GET.get('page')
         try:
             # If the page exists and the ?page=x is an int
