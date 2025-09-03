@@ -27,11 +27,38 @@ class FigureIndex(Page):
         FieldPanel("body"),
     ]
 
+    # def post(self, request):
+    #     if request.method == "POST":
+    #         print("POST request received")
+    #         media_type = request.POST.get("media_type")
+    #         print (media_type)
+    #         pass
+
     def get_context(self, request):
         context = super().get_context(request)
+        if request.method == "GET":
+            context['selected_media'] = request.GET.get('media_type', None)
+        else:
+            context['selected_media'] = None
+
         all_figures = FigureDetail.objects.live().descendant_of(self)
+        media_array = all_figures.values_list('media', flat=True).distinct().order_by('media')
+        context['media_array'] = media_array
+        if context['selected_media']:
+            print("Filtering by media:", context['selected_media'])
+            figures = all_figures.filter(media=context['selected_media'])
+            print(figures)
+        else:
+            print("No media filter applied")
+            figures = all_figures
+
+        # filter_param = request.GET.get('media', None)
+        # if filter_param:
+        #     Filter figures by media type if provided in the query parameters
+        #     all_figures = all_figures.filter(media=filter_param)
+
         # Pagination
-        paginator = Paginator(all_figures, 2)
+        paginator = Paginator(figures, 2)
         page = request.GET.get('page')
         try:
             # If the page exists and the ?page=x is an int
@@ -52,7 +79,6 @@ class FigureDetail(Page):
     parent_page_types = ['FigureIndex']
     subtitle = models.CharField(max_length=255, blank=True)
     weight = models.IntegerField(default=0, help_text="Lower number means higher priority in sorting.")
-    media_type = models.CharField(max_length=255, blank=True)
     body = RichTextField(blank=True)
     stripe_price_id = models.CharField(blank=True, default=default_artwork_price_id)
     price = models.DecimalField(blank=True, default="20.00", max_digits=10, decimal_places=2)
@@ -66,37 +92,31 @@ class FigureDetail(Page):
         related_name='+'
     )
 
-    CHOICE_A = 'Acrylic'
-    CHOICE_B = 'Oil'
-    CHOICE_C = 'Watercolor'
-    CHOICE_D = 'Print'
-    CHOICE_E = 'Graphite'
-    CHOICE_F = 'Pastel'
+    # CHOICE_A = 'Acrylic'
+    # CHOICE_B = 'Oil'
+    # CHOICE_C = 'Watercolor'
+    # CHOICE_D = 'Print'
+    # CHOICE_E = 'Graphite'
+    # CHOICE_F = 'Pastel'
 
     MY_CHOICES = [
-        (CHOICE_A, 'Acrylic'),
-        (CHOICE_B, 'Oil'),
-        (CHOICE_C, 'Watercolor'),
-        (CHOICE_D, 'Print'),
-        (CHOICE_E, 'Graphite'),
-        (CHOICE_F, 'Pastel'),
+        ('Acrylic', 'Acrylic'),
+        ('Oil', 'Oil'),
+        ('Watercolor', 'Watercolor'),
+        ('Print', 'Print'),
+        ('Graphite', 'Graphite'),
+        ('Pastel', 'Pastel'),
     ]
 
     media = models.CharField(
         max_length=24,
         choices=MY_CHOICES,
-        default=CHOICE_A,
+        default=None
     )
-
-    content_panels = Page.content_panels + [
-        FieldPanel('media'),
-    ]
-
 
     content_panels = Page.content_panels + [
         FieldPanel('subtitle'),
         FieldPanel('weight'),
-        FieldPanel('media_type'),
         FieldPanel('body'),
         FieldPanel('image'),
         FieldPanel('price'),
