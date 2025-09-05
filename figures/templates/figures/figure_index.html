@@ -6,14 +6,22 @@
 <div class="container crx-grid">
 <h2>Art work</h2>
 <p>{{ page.subtitle }}</p>
+<div class="row">
+    <div class="col-lg-12">
+      <div class="container">
+        {{ page.body|richtext }}
+      </div>
+    </div>
+  </div>
   <div class="row">
     <div class="col-lg-12">
       <form method="get" action=".">
         {% csrf_token %}
-        <select name="media_type" id"media_type" class="mb-2" onchange="this.form.submit()">
-          <option value="" {% if selected_media == "None" %} selected {% endif %}>All Media types</option>
+        <label for="media_type" class="form-label">Filter by Media type:</label>
+        <select name="media_type" id="media_type" class="mb-2 form-select" onchange="this.form.submit()">
+          <option value="All" {% if saved_choice != "All" %} selected {% endif %}>All Media types</option>
           {% for media_type in media_array %}
-          <option value="{{ media_type }}" {% if selected_media == media_type %} selected {%endif%}>{{ media_type }}</option>
+          <option value="{{ media_type }}" {% if media_type == saved_choice %} selected {%endif%}>{{ media_type }}</option>
           {% endfor %}
           </select>
         </form>

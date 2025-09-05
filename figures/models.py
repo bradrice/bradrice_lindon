@@ -36,28 +36,26 @@ class FigureIndex(Page):
 
     def get_context(self, request):
         context = super().get_context(request)
-        if request.method == "GET":
-            context['selected_media'] = request.GET.get('media_type', None)
+        if request.method == "GET" and 'media_type' in request.GET:
+            current_media_type = request.GET.get('media_type')
+            saved_choice = current_media_type
+            request.session['selected_media'] = current_media_type
+            request.session.save()
         else:
-            context['selected_media'] = None
+            saved_choice = request.session.get('selected_media', 'All')
 
         all_figures = FigureDetail.objects.live().descendant_of(self)
         media_array = all_figures.values_list('media', flat=True).distinct().order_by('media')
         context['media_array'] = media_array
-        if context['selected_media']:
-            print("Filtering by media:", context['selected_media'])
-            figures = all_figures.filter(media=context['selected_media'])
+        if saved_choice and saved_choice != 'All':
+            print("Filtering by media:", saved_choice)
+            figures = all_figures.filter(media=saved_choice)
             print(figures)
         else:
             print("No media filter applied")
             figures = all_figures
 
-        # filter_param = request.GET.get('media', None)
-        # if filter_param:
-        #     Filter figures by media type if provided in the query parameters
-        #     all_figures = all_figures.filter(media=filter_param)
-
-        # Pagination
+        # paginate based on current_media_type
         paginator = Paginator(figures, 6)
         page = request.GET.get('page')
         try:
@@ -70,7 +68,7 @@ class FigureIndex(Page):
             # If the ?page=x is out of range (too high most likely)
             # Then return the last page
             figures = paginator.page(paginator.num_pages)
-
+        context['saved_choice'] = saved_choice
         context['figures'] = figures
         return context
 
