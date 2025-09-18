@@ -1,6 +1,7 @@
 from django.conf import settings  # new
 from django.http.response import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
 from figures.models import FigureDetail
 from wagtail.images.models import Image
@@ -44,6 +45,7 @@ def checkout_view(request):
 
 
 @csrf_exempt
+@require_POST
 def create_checkout_session(request):
     # print("inside checkout session")
     if request.method == 'POST':
@@ -133,7 +135,8 @@ def create_checkout_session(request):
 
             # return JsonResponse({'sessionId': checkout_session['id']})
         except Exception as e:
-            return JsonResponse({'error': str(e)})
+            return HttpResponse("This method is not allowed.", status=405)
+            # return JsonResponse({'error': str(e)})
 
 
 class SuccessView(TemplateView):
