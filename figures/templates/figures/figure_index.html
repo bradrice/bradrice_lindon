@@ -1,3 +1,4 @@
+
 {% extends "coderedcms/pages/web_page.html" %}
 {% load wagtailcore_tags wagtailimages_tags coderedcms_tags %}/website/templates/coderedcms/pages/base.html" %}
 
@@ -27,20 +28,17 @@
         </form>
       </div>
         </div>
+  <div class="row figures gy-3">
 {% for figure in figures %}
-<div class="row">
-<div class="figureblock col-sm-12 col-md-6">
-      <a href="{{ figure.url}}">{% image figure.image width-300 %}</a>
-  </div>
-<div class="figureblock col-sm-12 col-md-6">
-  <h2><a href="{{ figure.url}}">{{ figure.title }}</a></h2>
-  <a href="{{ figure.url }}">Read More</a>
-</div>
+    <div class="figure-card col-lg-4 col-md-6 col-sm-12">
+      <div class="figureblock col-sm-12">
+        <a href="{{ figure.url}}">{% image figure.image width-300 %}</a>
+      <p class="figure-title"><a href="{{ figure.url}}">{{ figure.title }}</a></p>
+    </div>
   </div>
 {% endfor %}
 </div>
-    </div>
-</div>
+
 {# Only show pagination if there is more than one page to click through #}
   {% if figures.paginator.num_pages > 1 %}
     <div class="container">
