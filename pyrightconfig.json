@@ -1,0 +1,6 @@
+{
+  "venvPath": ".",
+  "venv": "env/",
+  "reportAttributeAccessIssue": "none",
+  "reportIncompatibleVariableOverride": "none"
+}

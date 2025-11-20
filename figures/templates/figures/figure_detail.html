@@ -17,7 +17,13 @@
 {% block content %}
 <div class="container container-flex">
 <h1>{{ page.title }}</h1>
-  <p>{{last_modified_date}}</p>
+  <p>{{page.last_published_at|date:"F j Y" }}</p>
+    {% if page.series_type %}
+    {% for loop in page.series_type.all %}
+  <p>Series: {{loop.snippet.text }}</p>
+  {% endfor %}
+  {% endif %}
+  <p>Media: {{page.media_type.name}}</p>
 <div class="figure">
   {% srcset_image page.image width-{360,780,1000} sizes="(max-width: 480px) 800px, 80vw" %}
 </div>
