@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 if os.environ.get('DJANGO_ENV') == 'production':
     load_dotenv(dotenv_path='.env.production')
@@ -45,6 +46,8 @@ INSTALLED_APPS = [
     "figures",
     "blogpages",
     "anymail",
+    'wagtailcaptcha',
+    'captcha',
     # Wagtail CRX (CodeRed Extensions)
     "coderedcms",
     "django_bootstrap5",
@@ -225,5 +228,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # custom implementation.
 CRX_DISABLE_NAVBAR = True
 CRX_DISABLE_FOOTER = True
-
 

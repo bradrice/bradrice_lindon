@@ -1,7 +1,7 @@
 
 {% extends "coderedcms/pages/web_page.html" %}
 {% load wagtailcore_tags wagtailimages_tags coderedcms_tags %}/website/templates/coderedcms/pages/base.html" %}
-
+{% load my_filters %}
 
 {% block content %}
 <div class="container crx-grid">
@@ -15,19 +15,28 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-lg-6">
-      <form method="get" action=".">
         {% csrf_token %}
+      <form method="get" action=".">
+    <div class="col-lg-6">
         <label for="media_type" class="form-label">Filter by Media type:</label>
         <select name="media_type" id="media_type" class="mb-2 form-select" onchange="this.form.submit()">
-          <option value="All" {% if saved_choice != "All" %} selected {% endif %}>All Media types</option>
+          <option value="All" {% if saved_choice == "All" %} selected {% endif %}>All Media types</option>
           {% for media_type in media_array %}
-          <option value="{{ media_type }}" {% if media_type == saved_choice %} selected {%endif%}>{{ media_type }}</option>
+          <option value="{{ media_type.name }}" {% if media_type.name == saved_choice %} selected {%endif%}>{{ media_type.name }}</option>
           {% endfor %}
           </select>
-        </form>
+    </div>
+    <div class="col-lg-6">
+        <label for="series_choice" class="form-label">Filter by Series type: {{series_choice}}</label>
+        <select name="series_choice" id="series_choice" class="mb-2 form-select" onchange="this.form.submit()">
+          <option value="All" {% if series_choice == "All" %} selected {% endif %}>All Series types</option>
+    {% for series in series_array %}
+          <option value="{{ series }}" {% if series.text == request.GET.series_choice %} selected {%endif%}>{{ series}}</option>
+  {% endfor %}
+          </select>
+      </form>
       </div>
-        </div>
+  </div>
   <div class="row figures gy-3">
 {% for figure in figures %}
     <div class="figure-card col-lg-4 col-md-6 col-sm-12">
