@@ -220,7 +220,7 @@ class MyPageSnippetOrderable(Orderable):
 
 @register_snippet
 class MediaSnippet(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, null=True, blank=True)
 
     panels = [
         FieldPanel('name'),
