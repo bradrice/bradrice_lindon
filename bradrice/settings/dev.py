@@ -1,16 +1,12 @@
-from .base import *  # noqa
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+
+from .base import *  # noqa
 
 # Determine the environment (e.g., 'development', 'production')
 DJANGO_ENV = os.getenv('DJANGO_ENV', 'development')  # Default to development
 load_dotenv(dotenv_path=f'.env.{DJANGO_ENV}')
-# ENV = os.getenv('DJANGO_ENV', 'development')
-#
-# if DJANGO_ENV == "development":
-#            load_dotenv(".env.development")
-#        else:
-#            load_dotenv(".env") # Load default .env for other environments (e.g., production)
 
 
 STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
@@ -32,10 +28,10 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 WAGTAIL_CACHE = False
 
-try:
-    from .local import *  # noqa
-except ImportError:
-    pass
+# try:
+#     from .local import *  # noqa
+# except ImportError:
+#     pass
 
 
 # LOGGING = {
