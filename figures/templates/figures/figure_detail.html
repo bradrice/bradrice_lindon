@@ -17,6 +17,7 @@
 {% block content %}
 <div class="container container-flex">
 <h1>{{ page.title }}</h1>
+<h2>{{ page.subtitle }}</h2>
   <p>{{page.last_published_at|date:"F j Y" }}</p>
     {% if page.series_type %}
     {% for loop in page.series_type.all %}

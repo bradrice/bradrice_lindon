@@ -105,7 +105,7 @@ class FigureDetail(Page):
     weight = models.IntegerField(default=10, help_text="Lower number means higher priority in sorting.")
     body = RichTextField(blank=True)
     stripe_price_id = models.CharField(blank=True, default=default_artwork_price_id)
-    price = models.DecimalField(blank=True, default=Decimal(20.00), max_digits=10, decimal_places=2)
+    price = models.DecimalField(blank=True, default=Decimal(200.00), max_digits=10, decimal_places=2)
     for_sale = models.BooleanField(default=False)
     sold = models.BooleanField(default=False)
     image = models.ForeignKey(
