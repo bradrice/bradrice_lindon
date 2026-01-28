@@ -54,6 +54,7 @@ class FigureIndex(Page):
             series_choice = request.session.get('series_choice', 'All')
 
         all_figures = FigureDetail.objects.live().descendant_of(self)
+        all_figures = all_figures.order_by('weight', 'title')
         # media_array = all_figures.values_list('media_type', flat=True).distinct().order_by('media_type')
         media_array = MediaSnippet.objects.all().distinct().order_by('name')
         context['media_array'] = media_array
@@ -81,7 +82,7 @@ class FigureIndex(Page):
             print("No series filter applied")
 
         # paginate based on current_media_type
-        paginator = Paginator(figures, 6)
+        paginator = Paginator(figures, 9)
         page = request.GET.get('page')
         try:
             # If the page exists and the ?page=x is an int
@@ -101,7 +102,7 @@ class FigureIndex(Page):
 class FigureDetail(Page):
     parent_page_types = ['FigureIndex']
     subtitle = models.CharField(max_length=255, blank=True)
-    weight = models.IntegerField(default=0, help_text="Lower number means higher priority in sorting.")
+    weight = models.IntegerField(default=10, help_text="Lower number means higher priority in sorting.")
     body = RichTextField(blank=True)
     stripe_price_id = models.CharField(blank=True, default=default_artwork_price_id)
     price = models.DecimalField(blank=True, default=Decimal(20.00), max_digits=10, decimal_places=2)
