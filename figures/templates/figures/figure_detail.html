@@ -34,7 +34,7 @@
     <h2>Additional views</h2>
      {% for img in gallery_images %}
 <div class="figure">
-  {% srcset_image img.image width-{360,780,1000} sizes="(max-width: 480px) 800px, 80vw" %}
+  {% srcset_image img.image width-{360,780,1000} sizes="(max-width: 800px) 800px, 80vw" %}
 </div>
     {% endfor %}
     {% endif %}

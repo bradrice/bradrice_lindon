@@ -1,14 +1,15 @@
-from django.db import models
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from wagtail.models import Page, Orderable
-from wagtail.fields import RichTextField, StreamField
-from wagtail.admin.panels import FieldPanel, InlinePanel
-from wagtail.images import get_image_model
-from wagtail.images.models import Image
-from wagtail.images.blocks import ImageChooserBlock
-from wagtail.blocks import RichTextBlock
+from django.db import models
 from modelcluster.fields import ParentalKey
+from wagtail.admin.panels import FieldPanel, InlinePanel
+from wagtail.blocks import RichTextBlock
+from wagtail.fields import RichTextField, StreamField
+from wagtail.images import get_image_model
+from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images.models import Image
+from wagtail.models import Orderable, Page
 from wagtail.snippets.blocks import SnippetChooserBlock
+
 
 class BlogIndex(Page):
     template = 'blogpages/blog_index.html'
@@ -27,7 +28,7 @@ class BlogIndex(Page):
         context = super().get_context(request)
         all_posts = BlogPost.objects.live().descendant_of(self)
         # Pagination
-        paginator = Paginator(all_posts, 2)
+        paginator = Paginator(all_posts, 4)
         page = request.GET.get('page')
         try:
             # If the page exists and the ?page=x is an int
