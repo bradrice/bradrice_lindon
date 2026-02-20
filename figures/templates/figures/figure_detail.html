@@ -26,7 +26,7 @@
   {% endif %}
   <p>Media: {{page.media_type.name}}</p>
 <div class="figure">
-  {% srcset_image page.image width-{1000,880,360} sizes="(max-width: 800px) 800px, 80vw" %}
+  {% srcset_image page.image width-{1000,880,360} sizes="(max-width: 600px) 480px, 80vw" class="img-fluid" %}
 </div>
 <p class="figure_body">{{ page.body |richtext}}</p>
 <div>
