@@ -14,9 +14,4 @@ class Migration(migrations.Migration):
             model_name='figuredetail',
             name='media_type',
         ),
-        migrations.AlterField(
-            model_name='figuredetail',
-            name='media',
-            field=models.CharField(choices=[('Acrylic', 'Acrylic'), ('Oil', 'Oil'), ('Watercolor', 'Watercolor'), ('Print', 'Print'), ('Graphite', 'Graphite'), ('Pastel', 'Pastel')], default=None, max_length=24, null=True, blank=True),
-        ),
     ]

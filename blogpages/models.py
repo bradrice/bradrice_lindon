@@ -93,6 +93,8 @@ class BlogPost(Page):
         image_url = Image.get_rendition(self.image, 'width-360').url if self.image else None
         context['image_url'] = domain_url = request.build_absolute_uri(image_url) if image_url else None
         context['weburl'] = request.build_absolute_uri(request.path)
+        context['next_post'] = self.get_next_siblings().live().public().first()
+        context['prev_post'] = self.get_prev_siblings().live().public().first()
         return context
 
     def __str__(self):

@@ -49,6 +49,18 @@
 
       </div>
     </div>
+    <div class="pagination" style="margin-top: 2em; display: flex; justify-content: space-between;">
+    <div class="prev-post">
+        {% if prev_post %}
+            <a href="{% pageurl prev_post %}">&larr; Previous: {{ prev_post.title }}</a>
+        {% endif %}
+    </div>
+    <div class="next-post">
+        {% if next_post %}
+            <a href="{% pageurl next_post %}">Next: {{ next_post.title }} &rarr;</a>
+        {% endif %}
+    </div>
+</div>
 
 </div>
 {% endblock content %}
