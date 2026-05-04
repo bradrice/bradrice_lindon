@@ -1,0 +1,22 @@
+{% extends "coderedcms/pages/web_page.html" %}
+{% load wagtailcore_tags wagtailimages_tags coderedcms_tags %}
+{% block index_filters %}{% endblock %}
+{% block index_content %}
+{% if page.index_show_subpages %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-9">
+      {% for article in index_paginated %}
+      {% include article.miniview_template with page=article h="h2" miniview_css_class="mb-5" %}
+      {% endfor %}
+    </div>
+    {% if page.index_classifiers.exists %}
+    <div class="col-md-3">
+      {% include "coderedcms/includes/classifier_nav.html" with navclass="nav-pills flex-column" %}
+    </div>
+    {% endif %}
+  </div>
+  {% include "coderedcms/includes/pagination.html" with items=index_paginated %}
+</div>
+{% endif %}
+{% endblock %}

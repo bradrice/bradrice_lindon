@@ -1,10 +1,6 @@
-fetch("/payments/config/")
-.then((result) => { return result.json(); })
-.then((data) => {
-  // Initialize Stripe.js
-  const stripe = Stripe(data.publicKey);
-
-  // new
-  // Event handler
+document.addEventListener("DOMContentLoaded", () => {
+  const dateItem = document.getElementById("currentYear");
+  const date = new Date();
+  const year = date.getFullYear();
+  dateItem.textContent = year;
 });
-
