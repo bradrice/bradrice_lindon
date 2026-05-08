@@ -106,6 +106,8 @@ class FigureDetail(Page):
     body = RichTextField(blank=True)
     stripe_price_id = models.CharField(blank=True, default=default_artwork_price_id)
     price = models.DecimalField(blank=True, default=Decimal(200.00), max_digits=10, decimal_places=2)
+    width = models.FloatField(blank=True, help_text="Width in inches", null=True)
+    height = models.FloatField(blank=True,  help_text="Height in inches", null=True)
     for_sale = models.BooleanField(default=False)
     sold = models.BooleanField(default=False)
     image = models.ForeignKey(
@@ -151,6 +153,8 @@ class FigureDetail(Page):
         FieldPanel('image'),
         FieldPanel('price'),
         FieldPanel('stripe_price_id'),
+        FieldPanel('width'),
+        FieldPanel('height'),
         FieldPanel('for_sale'),
         FieldPanel('sold'),
         InlinePanel('gallery_images', label='Gallery Images'),

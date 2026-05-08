@@ -1,5 +1,5 @@
 {% extends "coderedcms/pages/web_page.html" %}
-{% load wagtailcore_tags wagtailimages_tags coderedcms_tags currency_filters %}
+{% load wagtailcore_tags wagtailimages_tags coderedcms_tags currency_filters my_filters %}
 {% block frontend_assets %}
 
 <meta property="og:title" content="{{page.title}}" />
@@ -40,6 +40,9 @@
   {% srcset_image page.image width-{1000,880,360} sizes="(max-width: 600px) 480px, 80vw" class="img-fluid" %}
 </div>
 <p class="figure_body">{{ page.body |richtext}}</p>
+  {% if page.width and page.height %}
+  <p>Dimensions: {{page.width | inches_and_cm}} width x {{page.height | inches_and_cm}} height</p>
+  {% endif %}
 <div>
     {% if gallery_images|length > 0 %}
     <h2>Additional views</h2>
