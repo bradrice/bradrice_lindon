@@ -1,20 +1,19 @@
 import os
-from decimal import Decimal
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import models
 from dotenv import load_dotenv
 from modelcluster.fields import ParentalKey
+from wagtail import blocks
 from wagtail.admin.panels import FieldPanel, InlinePanel
 from wagtail.fields import RichTextField
 from wagtail.images import get_image_model
+from wagtail.images.blocks import ImageChooserBlock
 from wagtail.images.models import Image
 from wagtail.models import Orderable, Page
 from wagtail.snippets.models import register_snippet
 
 load_dotenv() # Load environment variables from .env
-
-default_artwork_price_id = os.getenv('STRIPE_ARTWORK_PRICE')
 
 
 class FigureIndex(Page):
@@ -27,6 +26,13 @@ class FigureIndex(Page):
         FieldPanel("subtitle"),
         FieldPanel("body"),
     ]
+
+    # def post(self, request):
+    #     if request.method == "POST":
+    #         print("POST request received")
+    #         media_type = request.POST.get("media_type")
+    #         print (media_type)
+    #         pass
 
     def get_context(self, request):
         context = super().get_context(request)
@@ -95,16 +101,15 @@ class FigureIndex(Page):
 class FigureDetail(Page):
     parent_page_types = ['FigureIndex']
     subtitle = models.CharField(max_length=255, blank=True)
-    weight = models.IntegerField(default=10, help_text="Lower number means higher priority in sorting.")
+    weight = models.IntegerField(default=0, help_text="Lower number means higher priority in sorting.")
     body = RichTextField(blank=True)
-    stripe_price_id = models.CharField(blank=True, default=default_artwork_price_id)
-    price = models.DecimalField(blank=True, default=Decimal(200.00), max_digits=10, decimal_places=2)
+    price = models.DecimalField(blank=True, default="0.00", max_digits=10, decimal_places=2)
     width = models.FloatField(blank=True, help_text="Width in inches", null=True)
     height = models.FloatField(blank=True,  help_text="Height in inches", null=True)
     for_sale = models.BooleanField(default=False)
     sold = models.BooleanField(default=False)
     image = models.ForeignKey(
-        'wagtailimages.Image',
+        get_image_model(),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -117,12 +122,7 @@ class FigureDetail(Page):
           on_delete=models.SET_NULL,
           related_name='+'
       )
-    # CHOICE_A = 'Acrylic'
-    # CHOICE_B = 'Oil'
-    # CHOICE_C = 'Watercolor'
-    # CHOICE_D = 'Print'
-    # CHOICE_E = 'Graphite'
-    # CHOICE_F = 'Pastel'
+
 
     # MY_CHOICES = [
     #     ('Acrylic', 'Acrylic'),
@@ -131,8 +131,11 @@ class FigureDetail(Page):
     #     ('Print', 'Print'),
     #     ('Graphite', 'Graphite'),
     #     ('Pastel', 'Pastel'),
+    #     ('Mixed-Media', 'Mixed-Media'),
+    #     ('Sketchbook', 'Sketchbook'),
+    #     ('Pen and Ink', 'Pen and Ink'),
     # ]
-    #
+
     # media = models.CharField(
     #     max_length=24,
     #     choices=MY_CHOICES,
@@ -145,17 +148,15 @@ class FigureDetail(Page):
         FieldPanel('body'),
         FieldPanel('image'),
         FieldPanel('price'),
-        FieldPanel('stripe_price_id'),
         FieldPanel('width'),
         FieldPanel('height'),
         FieldPanel('for_sale'),
         FieldPanel('sold'),
         InlinePanel('gallery_images', label='Gallery Images'),
         FieldPanel('media_type'),
-        # FieldPanel('MediaSnippet'),
         InlinePanel('series_type', label='Series Types'),
-    ]
 
+    ]
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
         context['gallery_images'] = self.gallery_images.all()
@@ -172,6 +173,13 @@ class FigureDetail(Page):
     def __str__(self):
         return self.title
 
+    media_type = models.ForeignKey(
+          'MediaSnippet',
+          null=True,
+          blank=True,
+          on_delete=models.SET_NULL,
+          related_name='+'
+      )
 
 class MyPageGalleryImage(models.Model):
     page = ParentalKey(FigureDetail, on_delete=models.CASCADE, related_name='gallery_images')
@@ -224,8 +232,8 @@ class MediaSnippet(models.Model):
         FieldPanel('name'),
     ]
 
-    def __str__(self) -> str:
-        return  self.name if self.name else "Unnamed Media"
+    def __str__(self):
+        return self.name
 
     class Meta:
         verbose_name = "Media Snippet"

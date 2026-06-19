@@ -35,9 +35,9 @@
   <p>Series: {{loop.snippet.text }}</p>
   {% endfor %}
   {% endif %}
-  <p>Media: {{page.media_type.name}}</p>
+  {# <p>Media: {{page.media_type.name}}</p> #}
 <div class="figure">
-  {% srcset_image page.image width-{1000,880,360} sizes="(max-width: 600px) 480px, 80vw" class="img-fluid" %}
+  {% srcset_image page.image width-{360,780,1000} sizes="(max-width: 480px) 800px, 80vw" %}
 </div>
 <p class="figure_body">{{ page.body |richtext}}</p>
   {% if page.width and page.height %}
@@ -52,7 +52,7 @@
 </div>
     {% endfor %}
     {% endif %}
-  {% if page.for_sale and not page.sold  %}
+  {% if page.for_sale and not page.sold %}
     <p>Price: {{page.price | currency}}</p>
 <form method="post" action="/payments/create-checkout-session/"
 <input type="hidden" name="product_id" value="prod_I0Ct56Y4YvHQwT"/>
