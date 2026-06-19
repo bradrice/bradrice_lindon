@@ -28,13 +28,6 @@ class FigureIndex(Page):
         FieldPanel("body"),
     ]
 
-    # def post(self, request):
-    #     if request.method == "POST":
-    #         print("POST request received")
-    #         media_type = request.POST.get("media_type")
-    #         print (media_type)
-    #         pass
-
     def get_context(self, request):
         context = super().get_context(request)
         if request.method == "GET" and 'media_type' in request.GET:
@@ -111,7 +104,7 @@ class FigureDetail(Page):
     for_sale = models.BooleanField(default=False)
     sold = models.BooleanField(default=False)
     image = models.ForeignKey(
-        get_image_model(),
+        'wagtailimages.Image',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -231,8 +224,8 @@ class MediaSnippet(models.Model):
         FieldPanel('name'),
     ]
 
-    def __str__(self):
-        return self.name
+    def __str__(self) -> str:
+        return  self.name if self.name else "Unnamed Media"
 
     class Meta:
         verbose_name = "Media Snippet"
