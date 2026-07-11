@@ -191,9 +191,11 @@ class NewsletterPage(CoderedWebPage):
     list_name = models.CharField(
         max_length=200,
         blank=True,
+        default="Newsletter",
         help_text=(
-            "Mailblast contact list to add subscribers to. "
-            "Leave blank to use the server's default list."
+            "Mailblast contact list to add subscribers to. Defaults to "
+            "\"Newsletter\"; clear it only to fall back to the server's "
+            "default list."
         ),
     )
 
