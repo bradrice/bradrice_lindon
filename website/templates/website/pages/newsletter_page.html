@@ -29,8 +29,7 @@
         <form method="post" novalidate>
           {% csrf_token %}
 
-          {# Honeypot: hidden from people, tempting to bots. Positioned off-screen
-             rather than display:none so it stays in the tab/submit flow. #}
+          {# Honeypot: off-screen (not display:none) so it stays in the submit flow; bots fill it, people don't. #}
           <div style="position:absolute; left:-9999px;" aria-hidden="true">
             <label>Leave this field empty
               <input type="text" name="hp" tabindex="-1" autocomplete="off">
@@ -39,9 +38,14 @@
 
           {% if page.collect_name %}
           <div class="mb-3">
-            <label for="nl-name" class="form-label">First name</label>
-            <input type="text" id="nl-name" name="first_name" class="form-control"
+            <label for="nl-first-name" class="form-label">First name</label>
+            <input type="text" id="nl-first-name" name="first_name" class="form-control"
                    value="{{ first_name|default:'' }}" autocomplete="given-name">
+          </div>
+          <div class="mb-3">
+            <label for="nl-last-name" class="form-label">Last name</label>
+            <input type="text" id="nl-last-name" name="last_name" class="form-control"
+                   value="{{ last_name|default:'' }}" autocomplete="family-name">
           </div>
           {% endif %}
 
