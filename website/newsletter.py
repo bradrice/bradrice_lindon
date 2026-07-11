@@ -25,8 +25,8 @@ def handle_subscribe(request, page) -> dict:
     """Process a signup POST and return template context.
 
     Returns a dict with ``submitted`` (True), ``success`` (bool), ``message``
-    (str, shown on failure), and echoes back ``email`` / ``first_name`` so a
-    failed form can be re-rendered with the user's input.
+    (str, shown on failure), and echoes back ``email`` / ``first_name`` /
+    ``last_name`` so a failed form can be re-rendered with the user's input.
     """
     # Honeypot: a hidden field real users never fill. If it has a value, treat
     # the request as a bot and report success without doing anything.
@@ -35,25 +35,26 @@ def handle_subscribe(request, page) -> dict:
 
     email = (request.POST.get("email") or "").strip()
     first_name = (request.POST.get("first_name") or "").strip()
+    last_name = (request.POST.get("last_name") or "").strip()
+
+    echo = {"email": email, "first_name": first_name, "last_name": last_name}
 
     try:
         validate_email(email)
     except ValidationError:
-        return {
-            "submitted": True, "success": False, "message": _ERR_INVALID,
-            "email": email, "first_name": first_name,
-        }
+        return {"submitted": True, "success": False, "message": _ERR_INVALID, **echo}
 
-    success, message = subscribe(email, first_name=first_name, list_name=page.list_name)
+    success, message = subscribe(
+        email, first_name=first_name, last_name=last_name, list_name=page.list_name
+    )
     if success:
         return {"submitted": True, "success": True, "message": ""}
-    return {
-        "submitted": True, "success": False, "message": message,
-        "email": email, "first_name": first_name,
-    }
+    return {"submitted": True, "success": False, "message": message, **echo}
 
 
-def subscribe(email: str, first_name: str = "", list_name: str = "") -> tuple[bool, str]:
+def subscribe(
+    email: str, first_name: str = "", last_name: str = "", list_name: str = ""
+) -> tuple[bool, str]:
     """POST one subscriber to Mailblast. Returns (success, user_facing_error)."""
     url = getattr(settings, "MAILBLAST_API_URL", "")
     key = getattr(settings, "MAILBLAST_API_KEY", "")
@@ -64,6 +65,8 @@ def subscribe(email: str, first_name: str = "", list_name: str = "") -> tuple[bo
     payload = {"email": email}
     if first_name:
         payload["first_name"] = first_name
+    if last_name:
+        payload["last_name"] = last_name
     if list_name:
         payload["list"] = list_name
 

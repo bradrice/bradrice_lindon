@@ -40,12 +40,14 @@ class HandleSubscribeTests(TestCase):
     def test_valid_signup_posts_expected_payload(self, post):
         post.return_value = mock.Mock(status_code=200)
         result = newsletter.handle_subscribe(
-            self._post(email="a@x.com", first_name="Ann"), _page(list_name="News")
+            self._post(email="a@x.com", first_name="Ann", last_name="Lee"),
+            _page(list_name="News"),
         )
         self.assertTrue(result["success"])
         _, kwargs = post.call_args
         self.assertEqual(
-            kwargs["json"], {"email": "a@x.com", "first_name": "Ann", "list": "News"}
+            kwargs["json"],
+            {"email": "a@x.com", "first_name": "Ann", "last_name": "Lee", "list": "News"},
         )
         self.assertEqual(kwargs["headers"], {"X-API-Key": "test-key"})
 
