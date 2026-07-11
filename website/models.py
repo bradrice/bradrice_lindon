@@ -19,9 +19,11 @@ from coderedcms.models import CoderedLocationIndexPage
 from coderedcms.models import CoderedLocationPage
 from coderedcms.models import CoderedWebPage
 from django.db import models
+from django.template.response import TemplateResponse
 from modelcluster.fields import ParentalKey
 from wagtail import blocks
 from wagtail.admin.panels import FieldPanel
+from wagtail.admin.panels import MultiFieldPanel
 from wagtail.fields import StreamField
 from wagtail.snippets.models import register_snippet
 
@@ -158,6 +160,65 @@ class WebPage(CoderedWebPage):
         verbose_name = "Web Page"
 
     template = "coderedcms/pages/web_page.html"
+
+
+class NewsletterPage(CoderedWebPage):
+    """
+    A web page with a newsletter signup form. Submissions are forwarded
+    server-side to the Mailblast subscribe API (see website.newsletter).
+    """
+
+    class Meta:
+        verbose_name = "Newsletter Signup Page"
+
+    template = "website/pages/newsletter_page.html"
+
+    form_heading = models.CharField(
+        max_length=255,
+        blank=True,
+        default="Subscribe to the newsletter",
+    )
+    button_text = models.CharField(max_length=80, blank=True, default="Subscribe")
+    success_message = models.TextField(
+        blank=True,
+        default="Thanks for subscribing!",
+        help_text="Shown after a successful signup.",
+    )
+    collect_name = models.BooleanField(
+        default=False,
+        help_text="Also ask subscribers for their first name.",
+    )
+    list_name = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text=(
+            "Mailblast contact list to add subscribers to. "
+            "Leave blank to use the server's default list."
+        ),
+    )
+
+    body_content_panels = CoderedWebPage.body_content_panels + [
+        MultiFieldPanel(
+            [
+                FieldPanel("form_heading"),
+                FieldPanel("collect_name"),
+                FieldPanel("button_text"),
+                FieldPanel("success_message"),
+                FieldPanel("list_name"),
+            ],
+            heading="Newsletter form",
+        ),
+    ]
+
+    def serve(self, request, *args, **kwargs):
+        """Render normally on GET; process the signup on POST and re-render."""
+        if request.method == "POST":
+            from .newsletter import handle_subscribe
+
+            context = self.get_context(request, *args, **kwargs)
+            context.update(handle_subscribe(request, self))
+            return TemplateResponse(request, self.get_template(request), context)
+        return super().serve(request, *args, **kwargs)
 
 
 # -- Navbar & Footer ----------------------------------------------------------
