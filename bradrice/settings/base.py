@@ -214,6 +214,13 @@ ANYMAIL = {
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 
+# Mailblast subscribe API (newsletter signup form -> mailblast /api/subscribe/).
+# Set both in .env.development / .env.production. Blank = signup disabled (the
+# form shows a friendly "temporarily unavailable" message rather than erroring).
+MAILBLAST_API_URL = os.getenv("MAILBLAST_API_URL", "")
+MAILBLAST_API_KEY = os.getenv("MAILBLAST_API_KEY", "")
+
+
 # Tags
 
 TAGGIT_CASE_INSENSITIVE = True

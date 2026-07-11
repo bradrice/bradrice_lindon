@@ -1,0 +1,64 @@
+{% extends "coderedcms/pages/web_page.html" %}
+{% load wagtailcore_tags coderedcms_tags %}
+
+{% block content %}
+<div class="container my-5">
+
+  {# Page body (StreamField) — intro copy, images, etc. above the form. #}
+  {% for block in page.body %}
+    {% include_block block with settings=settings %}
+  {% endfor %}
+
+  <div class="row justify-content-center mt-4">
+    <div class="col-lg-6">
+
+      {% if submitted and success %}
+        <div class="alert alert-success" role="alert">
+          {{ page.success_message }}
+        </div>
+      {% else %}
+
+        {% if submitted and not success %}
+          <div class="alert alert-danger" role="alert">{{ message }}</div>
+        {% endif %}
+
+        {% if page.form_heading %}
+          <h2 class="h4 mb-3">{{ page.form_heading }}</h2>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {# Honeypot: hidden from people, tempting to bots. Positioned off-screen
+             rather than display:none so it stays in the tab/submit flow. #}
+          <div style="position:absolute; left:-9999px;" aria-hidden="true">
+            <label>Leave this field empty
+              <input type="text" name="hp" tabindex="-1" autocomplete="off">
+            </label>
+          </div>
+
+          {% if page.collect_name %}
+          <div class="mb-3">
+            <label for="nl-name" class="form-label">First name</label>
+            <input type="text" id="nl-name" name="first_name" class="form-control"
+                   value="{{ first_name|default:'' }}" autocomplete="given-name">
+          </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label for="nl-email" class="form-label">Email address</label>
+            <input type="email" id="nl-email" name="email" class="form-control"
+                   value="{{ email|default:'' }}" required autocomplete="email">
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            {{ page.button_text|default:"Subscribe" }}
+          </button>
+        </form>
+
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}
