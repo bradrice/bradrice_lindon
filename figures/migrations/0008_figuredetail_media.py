@@ -10,4 +10,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='figuredetail',
+            name='media',
+            field=models.CharField(choices=[('Acrylic', 'Acrylic'), ('Oil', 'Oil'), ('Watercolor', 'Watercolor'), ('Print', 'Print'), ('Graphite', 'Graphite'), ('Pastel', 'Pastel')], default='Acrylic', max_length=24),
+        ),
     ]
