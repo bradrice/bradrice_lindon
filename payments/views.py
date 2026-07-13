@@ -3,7 +3,6 @@ import os
 
 import stripe
 from django.conf import settings  # new
-from django.core.mail import send_mail
 from django.http.response import (HttpResponse, HttpResponseRedirect,
                                   JsonResponse)
 from django.views.decorators.csrf import csrf_exempt
@@ -148,43 +147,3 @@ class SuccessView(TemplateView):
 
 class CancelledView(TemplateView):
     template_name = 'cancelled.html'
-
-
-@csrf_exempt
-def stripe_webhook(request):
-    stripe.api_key = settings.STRIPE_SECRET_KEY
-    endpoint_secret = settings.STRIPE_ENDPOINT_SECRET
-    payload = request.body
-    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
-    event = None
-
-    try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, endpoint_secret
-        )
-    except ValueError as e:
-        # Invalid payload
-        return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError as e:
-        # Invalid signature
-        return HttpResponse(status=400)
-
-    # Handle the checkout.session.completed event
-    if event.type == 'payment_intent.succeeded':
-        print('PaymentIntent was successful!')
-
-    elif event['type'] == 'checkout.session.completed':
-        session = event.data.object # contains a stripe.PaymentIntent
-        metadata = session['metadata']
-        # print("Payment was successful.")
-        # print(json.dumps(session, indent=2))
-        objectid = metadata.get('product_id')
-        product = FigureDetail.objects.get(pk=objectid)
-        product.for_sale = False
-        product.sold = True
-        product.save()
-
-        # TODO: run some custom code here
-        send_mail("artwork sold", "this artwork sold on your website", 'admin@oh-joy.org', ["bradrice1@gmail.com"])
-
-    return HttpResponse(status=200)
