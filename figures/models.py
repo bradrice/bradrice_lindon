@@ -233,7 +233,7 @@ class MediaSnippet(models.Model):
     ]
 
     def __str__(self):
-        return self.name
+        return self.name if self.name else "Unnamed Media"
 
     class Meta:
         verbose_name = "Media Snippet"
