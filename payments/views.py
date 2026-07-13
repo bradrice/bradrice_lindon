@@ -1,15 +1,18 @@
+import json
+import os
+
+import stripe
 from django.conf import settings  # new
-from django.http.response import JsonResponse, HttpResponse, HttpResponseRedirect
+from django.core.mail import send_mail
+from django.http.response import (HttpResponse, HttpResponseRedirect,
+                                  JsonResponse)
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
-from figures.models import FigureDetail
-from wagtail.images.models import Image
-import json
-import stripe
-
 from dotenv import load_dotenv
-import os
+from wagtail.images.models import Image
+
+from figures.models import FigureDetail
 
 ENV = os.getenv('DJANGO_ENV', 'development')
 
@@ -182,6 +185,6 @@ def stripe_webhook(request):
         product.save()
 
         # TODO: run some custom code here
-        # send_mail("artwork sold", "this artwork sold on your website", 'admin@oh-joy.org', ["bradrice1@gmail.com"])
+        send_mail("artwork sold", "this artwork sold on your website", 'admin@oh-joy.org', ["bradrice1@gmail.com"])
 
     return HttpResponse(status=200)
