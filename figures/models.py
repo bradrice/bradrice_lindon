@@ -53,7 +53,7 @@ class FigureIndex(Page):
             series_choice = request.session.get('series_choice', 'All')
 
         all_figures = FigureDetail.objects.live().descendant_of(self)
-        all_figures = all_figures.order_by('weight', 'title')
+        all_figures = all_figures.order_by('weight', '-first_published_at')
         # media_array = all_figures.values_list('media_type', flat=True).distinct().order_by('media_type')
         media_array = MediaSnippet.objects.all().distinct().order_by('name')
         context['media_array'] = media_array
@@ -69,16 +69,11 @@ class FigureIndex(Page):
             figures = all_figures
 
         if series_choice and series_choice != 'All':
-            print("Filtering by series:", series_choice)
-            # figures = figures.filter(series_type=series_choice)
-            for figure in figures:
-                if figure.series_type.filter(snippet__text=series_choice).exists():
-                    pass
-                else:
-                    figures = figures.exclude(id=figure.id)
-            print(figures)
-        else:
-            print("No series filter applied")
+            # Single query across the series relation (was a per-figure loop
+            # that ran one query per figure — untenable at hundreds of images).
+            figures = figures.filter(
+                series_type__snippet__text=series_choice
+            ).distinct()
 
         # paginate based on current_media_type
         paginator = Paginator(figures, 9)
@@ -101,7 +96,12 @@ class FigureIndex(Page):
 class FigureDetail(Page):
     parent_page_types = ['FigureIndex']
     subtitle = models.CharField(max_length=255, blank=True)
-    weight = models.IntegerField(default=0, help_text="Lower number means higher priority in sorting.")
+    weight = models.IntegerField(
+        default=100000,
+        help_text="Sort priority — lower floats to the front. Leave at the "
+                  "default and the image sorts with the newest; set a low "
+                  "number (e.g. 10, 20, 30) to pin it toward the top.",
+    )
     body = RichTextField(blank=True)
     price = models.DecimalField(blank=True, default="0.00", max_digits=10, decimal_places=2)
     width = models.FloatField(blank=True, help_text="Width in inches", null=True)
@@ -166,9 +166,9 @@ class FigureDetail(Page):
         return context
 
     class Meta:
-        # Define the default ordering for queries on this model
-        # Products with lower 'weight' values will appear first
-        ordering = ['weight', 'title'] # You can add other fields for secondary sorting
+        # Lower 'weight' first (pinned images); everything else ties at the
+        # default weight and falls back to newest-first.
+        ordering = ['weight', '-first_published_at']
 
     def __str__(self):
         return self.title
