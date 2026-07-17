@@ -23,6 +23,7 @@ from django.template.response import TemplateResponse
 from modelcluster.fields import ParentalKey
 from wagtail import blocks
 from wagtail.admin.panels import FieldPanel
+from wagtail.contrib.forms.models import FormMixin
 from wagtail.admin.panels import MultiFieldPanel
 from wagtail.fields import StreamField
 from wagtail.snippets.models import register_snippet
@@ -89,9 +90,18 @@ class EventOccurrence(CoderedEventOccurrence):
     event = ParentalKey(EventPage, related_name="occurrences")
 
 
-class FormPage(CoderedFormPage):
+class FormPage(CoderedFormPage, FormMixin):
     """
     A page with an html <form>.
+
+    Also inherits Wagtail's ``FormMixin`` so this page satisfies the
+    ``isinstance(page, FormMixin)`` guard Wagtail 7.x added to its admin
+    submissions view and gains the ``get_submissions()`` /
+    ``get_submissions_list_view_class()`` methods that view now expects.
+    Without this, viewing form submissions in the admin 404s / errors, since
+    ``CoderedFormMixin`` does not inherit from Wagtail's ``FormMixin``.
+    CodeRed's own methods win in the MRO, so behavior is unchanged.
+    See https://github.com/coderedcorp/coderedcms/issues/710
     """
 
     class Meta:
