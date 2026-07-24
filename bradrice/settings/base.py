@@ -125,6 +125,16 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
+        # WAL mode: readers don't block the writer (and vice versa), and
+        # busy_timeout makes a writer wait rather than erroring "database is
+        # locked". Requires Django >= 5.1 for SQLite init_command.
+        "OPTIONS": {
+            "init_command": (
+                "PRAGMA journal_mode=WAL;"
+                "PRAGMA synchronous=NORMAL;"
+                "PRAGMA busy_timeout=5000;"
+            ),
+        },
     }
 }
 
