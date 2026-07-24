@@ -90,7 +90,7 @@ class BlogPost(Page):
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
-        image_url = Image.get_rendition(self.image, 'width-360').url if self.image else None
+        image_url = Image.get_rendition(self.image, 'fill-1200x630').url if self.image else None
         context['image_url'] = domain_url = request.build_absolute_uri(image_url) if image_url else None
         context['weburl'] = request.build_absolute_uri(request.path)
         context['next_post'] = self.get_next_siblings().live().public().first()
