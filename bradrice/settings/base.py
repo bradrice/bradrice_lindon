@@ -128,11 +128,18 @@ DATABASES = {
         # WAL mode: readers don't block the writer (and vice versa), and
         # busy_timeout makes a writer wait rather than erroring "database is
         # locked". Requires Django >= 5.1 for SQLite init_command.
+        # busy_timeout is 20s (not 5s): under WAL there is still a single
+        # writer, and on this RAM-tight box a writer can briefly stall past 5s
+        # (swap), which surfaced as intermittent "database is locked" 500s when
+        # saving pages in the admin. 20s lets the contending write wait it out.
+        # "timeout" mirrors this at the sqlite3.connect level so it applies
+        # regardless of init_command ordering.
         "OPTIONS": {
+            "timeout": 20,
             "init_command": (
                 "PRAGMA journal_mode=WAL;"
                 "PRAGMA synchronous=NORMAL;"
-                "PRAGMA busy_timeout=5000;"
+                "PRAGMA busy_timeout=20000;"
             ),
         },
     }
