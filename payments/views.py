@@ -1,10 +1,12 @@
 import json
+import logging
 import os
+from urllib.parse import urljoin
 
 import stripe
 from django.conf import settings  # new
-from django.http.response import (HttpResponse, HttpResponseRedirect,
-                                  JsonResponse)
+from django.http.response import (HttpResponse, HttpResponseNotFound,
+                                  HttpResponseRedirect, JsonResponse)
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
@@ -17,6 +19,8 @@ ENV = os.getenv('DJANGO_ENV', 'development')
 
 load_dotenv(dotenv_path=f'.env.{ENV}') # Load development environment variables from .env
 # Create your views here.
+
+logger = logging.getLogger(__name__)
 
 default_irpin_book_price_id = os.getenv('IRPIN_BOOKLET_PRICE')
 irpin_shipping_id = os.getenv('IRPIN_BOOKLET_SHIPPING_ID')
@@ -51,12 +55,12 @@ def checkout_view(request):
 def create_checkout_session(request):
     # print("inside checkout session")
     if request.method == 'POST':
-        image = request.POST.get('image')
+        # The booklet has a fixed Stripe Price; artwork prices come from the
+        # database in the branch below. `price`, `title` and `image` are also
+        # posted by the artwork form but deliberately ignored — they are
+        # client-controlled and the DB is authoritative.
         price_id = default_irpin_book_price_id
-            # price_id = request.POST.get('price_id')
         product_type = request.POST.get('product_type')
-        unit_price = request.POST.get('price')
-        title = request.POST.get('title')
         domain_url = request.build_absolute_uri('/')
         stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -95,11 +99,41 @@ def create_checkout_session(request):
                 return HttpResponseRedirect(checkout_session.url)
 
             else:
-                product = FigureDetail.objects.get(id=request.POST.get('product_id'))
-                image_url = Image.get_rendition(product.image, 'width-360').url if product.image else None
-                product_id = os.getenv('ART_PRODUCT_ID')
-                price_id = os.getenv('STRIPE_ARTWORK_PRICE ')
-                unit_price = int(float(unit_price))
+                try:
+                    product = FigureDetail.objects.get(id=request.POST.get('product_id'))
+                except FigureDetail.DoesNotExist:
+                    logger.warning(
+                        "artwork checkout: no FigureDetail with id=%r",
+                        request.POST.get('product_id'),
+                    )
+                    return HttpResponseNotFound("That artwork could not be found.")
+
+                # Price comes from the database, never from the form. It used to be
+                # read from `request.POST['price']`, a hidden input — so a client
+                # could edit it and pay any amount for any piece.
+                #
+                # `price` is a DecimalField(decimal_places=2), so multiplying by 100
+                # gives exact cents. The previous `int(float(price))` truncated to
+                # whole dollars, silently dropping the cents.
+                unit_amount = int(product.price * 100)
+
+                # There is no Stripe Price object per artwork (the model has no
+                # stripe_price_id — the template's hidden `price_id` input always
+                # rendered empty), so the amount is passed inline via `price_data`.
+                # NOTE: `price` is not a valid key inside `price_data` — it belongs on
+                # the line item itself, and the two are mutually exclusive. Passing it
+                # here is what made Stripe reject every artwork checkout.
+                price_data = {
+                    'unit_amount': unit_amount,
+                    'currency': 'usd',
+                    'product_data': {'name': product.title},
+                }
+                if product.image:
+                    # urljoin, not concatenation: domain_url ends in "/" and the
+                    # rendition URL begins with one, which produced "https://host//media/...".
+                    rendition_url = Image.get_rendition(product.image, 'width-360').url
+                    price_data['product_data']['images'] = [urljoin(domain_url, rendition_url)]
+
                 checkout_session = stripe.checkout.Session.create(
                     success_url=domain_url + 'payments/success?session_id={CHECKOUT_SESSION_ID}',
                     cancel_url=domain_url + 'payments/cancelled/',
@@ -118,27 +152,22 @@ def create_checkout_session(request):
                     shipping_address_collection={"allowed_countries": ["US", "CA"]},
                     line_items = [
                         {
-                        'price_data' : {
-                            'price': price_id,
-                            'unit_amount': unit_price * 100,
-                            'currency': 'usd',
-                            'product_data': {
-                            'name': title,
-                            'images': [f"{domain_url}{image_url}"],
-                            },
-                        },
-                        'quantity': 1,
+                            'quantity': 1,
+                            'price_data': price_data,
                         },
                     ],
-                ),
-                # return JsonResponse(checkout_session, safe=False)
+                )
 
-                return HttpResponseRedirect(checkout_session[0].url)
+                return HttpResponseRedirect(checkout_session.url)
 
-            # return JsonResponse({'sessionId': checkout_session['id']})
-        except Exception as e:
-            return HttpResponse("This method is not allowed.", status=405)
-            # return JsonResponse({'error': str(e)})
+        except Exception:
+            # Was: swallowed silently and returned 405 "This method is not allowed.",
+            # so a failing checkout looked like a routing problem and left no trace.
+            logger.exception(
+                "checkout session failed (product_type=%r, product_id=%r)",
+                request.POST.get('product_type'), request.POST.get('product_id'),
+            )
+            return HttpResponse("Sorry — we could not start checkout. Please try again.", status=502)
 
 
 class SuccessView(TemplateView):
