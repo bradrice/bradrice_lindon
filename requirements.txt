@@ -1,4 +1,38 @@
 # Consult release notes for supported versions of Django, Wagtail, and Python.
 # https://docs.coderedcorp.com/wagtail-crx/releases/
-coderedcms==6.0.*
-wagtail==7.4.*
+#
+# coderedcms gates the compatible Wagtail/Django versions, so upgrade coderedcms
+# and let it pull the pair it supports — don't bump Wagtail or Django alone.
+#
+# Everything the app needs at runtime is pinned here so a deploy reproduces a
+# known-good environment. Django especially: it was previously unpinned, which is
+# how production ended up on 5.2.1 while a fresh install resolved 5.2.17 — the
+# deployed version depended entirely on when pip last ran.
+coderedcms==6.0.0
+wagtail==7.4.2
+django==5.2.17
+
+# Imported by bradrice/settings/__init__.py at module load — the app will not
+# start without it.
+python-dotenv==1.1.1
+
+# "anymail" is in INSTALLED_APPS (transactional email via Mailgun).
+django-anymail==13.0
+
+# Used by the payments app.
+stripe==5.5.0
+
+# "wagtailcaptcha" is in INSTALLED_APPS (reCAPTCHA on Wagtail forms).
+wagtail-django-recaptcha==2.1.1
+
+# INSTALLED_APPS still lists the app as "captcha", which is django-recaptcha's
+# pre-4.0 module name — 4.x renamed it to "django_recaptcha". Production
+# resolves that by also having the standalone `captcha` distribution installed,
+# which provides an importable "captcha" module. Pinned to match production
+# exactly; the tidier fix is to rename the INSTALLED_APPS entry to
+# "django_recaptcha" and drop this, but that touches form rendering so it is
+# deliberately not bundled with a Django patch bump.
+captcha==0.7.1
+
+# WSGI server used by the systemd unit on lindon.
+gunicorn==23.0.0
