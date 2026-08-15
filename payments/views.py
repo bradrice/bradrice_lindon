@@ -22,9 +22,11 @@ load_dotenv(dotenv_path=f'.env.{ENV}') # Load development environment variables 
 
 logger = logging.getLogger(__name__)
 
+# A Stripe Price already belongs to a Product, so passing the price is enough for
+# the booklet — there is no product id to send. IRPIN_PRODUCT_ID and ART_PRODUCT_ID
+# are read by nothing.
 default_irpin_book_price_id = os.getenv('IRPIN_BOOKLET_PRICE')
 irpin_shipping_id = os.getenv('IRPIN_BOOKLET_SHIPPING_ID')
-irpin_product_id = os.getenv('IRPIN_PRODUCT_ID')
 
 
 class PaymentsPageView(TemplateView):
@@ -39,27 +41,14 @@ def stripe_config(request):
         return JsonResponse(stripe_config, safe=False)
 
 @csrf_exempt
-def checkout_view(request):
-    if request.method == 'POST':
-       # price_id = request.POST.get('price_id')
-       price_id = "price_1RjhFyHr3XrGP7sjocSQhToz"
-       product_id = request.POST.get('product_id')
-       domain_url = request.build_absolute_uri('/')
-       stripe.api_key = settings.STRIPE_SECRET_KEY
-       return HttpResponse(staus=200)
-
-
-
-@csrf_exempt
 @require_POST
 def create_checkout_session(request):
     # print("inside checkout session")
     if request.method == 'POST':
-        # The booklet has a fixed Stripe Price; artwork prices come from the
-        # database in the branch below. `price`, `title` and `image` are also
-        # posted by the artwork form but deliberately ignored — they are
-        # client-controlled and the DB is authoritative.
-        price_id = default_irpin_book_price_id
+        # The booklet has a fixed Stripe Price, set in the environment; artwork
+        # prices come from the database in the branch below. `price`, `title`
+        # and `image` are also posted by the artwork form but deliberately
+        # ignored — they are client-controlled and the DB is authoritative.
         product_type = request.POST.get('product_type')
         domain_url = request.build_absolute_uri('/')
         stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -75,7 +64,30 @@ def create_checkout_session(request):
             # For full details see https://stripe.com/docs/api/checkout/sessions/create
 
             # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
-            if (product_type == "irpin"):
+            if product_type == "irpin":
+                # Both IDs come from the environment, and until now this branch
+                # had never run in production — nothing posted `product_type`,
+                # so its configuration has never actually been exercised. A
+                # blank value would reach Stripe as None and come back as an
+                # opaque parameter error, so fail here with a legible log line.
+                missing = [
+                    name
+                    for name, value in (
+                        ('IRPIN_BOOKLET_PRICE', default_irpin_book_price_id),
+                        ('IRPIN_BOOKLET_SHIPPING_ID', irpin_shipping_id),
+                    )
+                    if not value
+                ]
+                if missing:
+                    logger.error(
+                        "booklet checkout misconfigured: %s not set in .env.%s",
+                        ", ".join(missing), ENV,
+                    )
+                    return HttpResponse(
+                        "Sorry — the booklet is not available for purchase right now.",
+                        status=503,
+                    )
+
                 checkout_session = stripe.checkout.Session.create(
                     success_url=domain_url + 'payments/success?session_id={CHECKOUT_SESSION_ID}',
                     cancel_url=domain_url + 'payments/cancelled/',
@@ -90,7 +102,7 @@ def create_checkout_session(request):
                     line_items=[
                         {
                             'quantity': 1,
-                            'price': price_id,
+                            'price': default_irpin_book_price_id,
                             "adjustable_quantity": {"enabled": True, "minimum": 1, "maximum": 10},
                         }
                     ]
