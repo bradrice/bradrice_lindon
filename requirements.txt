@@ -20,7 +20,7 @@ python-dotenv==1.1.1
 django-anymail==13.0
 
 # Used by the payments app.
-stripe==5.5.0
+stripe==15.5.0
 
 # "wagtailcaptcha" is in INSTALLED_APPS (reCAPTCHA on Wagtail forms).
 wagtail-django-recaptcha==2.1.1
