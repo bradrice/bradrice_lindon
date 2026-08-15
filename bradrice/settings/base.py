@@ -253,3 +253,18 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CRX_DISABLE_NAVBAR = True
 CRX_DISABLE_FOOTER = True
 
+
+# Stripe API version, pinned deliberately rather than left to the account
+# default. Two reasons it is set here and not in the environment: it is not a
+# secret, and it belongs with the code that was written against it — changing
+# it should be a reviewed commit, not an unlogged edit to a file on the server.
+#
+# The account default is still 2020-08-27. stripe-python 8.0.0 and later stop
+# deferring to the account default and send the version they were built for, so
+# upgrading the SDK moves the API version whether or not you intend it. Naming
+# it here means the version in use is whatever this line says, independent of
+# both the account setting and the installed SDK.
+#
+# Keep this in step with the pinned `stripe` release in requirements.txt.
+STRIPE_API_VERSION = "2026-07-29.dahlia"
+

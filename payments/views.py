@@ -52,6 +52,7 @@ def create_checkout_session(request):
         product_type = request.POST.get('product_type')
         domain_url = request.build_absolute_uri('/')
         stripe.api_key = settings.STRIPE_SECRET_KEY
+        stripe.api_version = settings.STRIPE_API_VERSION
 
         try:
             # return HttpResponse(product_type)
