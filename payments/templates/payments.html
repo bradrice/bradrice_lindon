@@ -12,10 +12,14 @@
   <body>
 {% block content_body %}
   <section class="section">
-    <form method="post" action={% url 'create-checkout-session' %}>
+    {# `product_type` is what selects the booklet branch in the view. Without it
+       the post fell through to the artwork branch, which looked the Stripe
+       product id up as a Django primary key and failed. The price and shipping
+       rate come from the environment, so no other input is needed here — the
+       old `product_id` and `price_id` inputs were read by nothing. #}
+    <form method="post" action="{% url 'create-checkout-session' %}">
         {% csrf_token %}
-        <input type="hidden" name="product_id" value="prod_Sf1ICdlKf3zgCt">
-        <input type="hidden" name="price_id" value="price_1RjhFyHr3XrGP7sjocSQhToz">
+        <input type="hidden" name="product_type" value="irpin">
         <button type="submit">Click Me</button>
     </form>
   </section>
