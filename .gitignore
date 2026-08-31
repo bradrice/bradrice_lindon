@@ -198,6 +198,13 @@ tags
 __pycache__/
 local_settings.py
 *.sqlite3
+# SQLite sidecars. "*.sqlite3" does not cover these -- they end in "-wal" /
+# "-shm", not ".sqlite3". The first two appear whenever the database is open in
+# WAL mode (which this project enables); "-journal" is the rollback-mode
+# equivalent. All three are transient state belonging to an open database.
+*.sqlite3-wal
+*.sqlite3-shm
+*.sqlite3-journal
 
 # If your build process includes running collectstatic, then you probably don't need or want to include staticfiles/
 # in your Git repository. Update and uncomment the following line accordingly.
