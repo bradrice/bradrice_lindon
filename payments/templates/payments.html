@@ -12,11 +12,17 @@
   <body>
 {% block content_body %}
   <section class="section">
-    {# `product_type` is what selects the booklet branch in the view. Without it
+    {% comment %}
+       `product_type` is what selects the booklet branch in the view. Without it
        the post fell through to the artwork branch, which looked the Stripe
        product id up as a Django primary key and failed. The price and shipping
        rate come from the environment, so no other input is needed here — the
-       old `product_id` and `price_id` inputs were read by nothing. #}
+       old `product_id` and `price_id` inputs were read by nothing.
+
+       Keep this in a comment block, not the hash-brace form: Django's tokenizer
+       matches that form without DOTALL, so one spanning several lines is never
+       recognised as a comment and renders verbatim on the page.
+    {% endcomment %}
     <form method="post" action="{% url 'create-checkout-session' %}">
         {% csrf_token %}
         <input type="hidden" name="product_type" value="irpin">

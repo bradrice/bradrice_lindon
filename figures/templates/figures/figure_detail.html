@@ -56,11 +56,17 @@
     {% endif %}
   {% if page.for_sale and not page.sold %}
     <p>Price: {{page.price | currency}}</p>
-{# The view looks the piece up by pk and reads its price from the database, so
+{% comment %}
+   The view looks the piece up by pk and reads its price from the database, so
    product_id is the only field it needs. The old form also posted price, title,
    image and a `price_id` from a `stripe_price_id` attribute that does not exist
    on the model (so it always rendered empty). Posting the price was the problem:
-   it was a hidden input the client could edit. #}
+   it was a hidden input the client could edit.
+
+   Keep this in a comment block, not the hash-brace form: Django's tokenizer
+   matches that form without DOTALL, so one spanning several lines is never
+   recognised as a comment and renders verbatim on the page. This one did.
+{% endcomment %}
 <form method="post" action="/payments/create-checkout-session/">
 {% csrf_token %}
 <input type="hidden" name="product_id" value="{{ page.pk }}"/>
