@@ -115,32 +115,6 @@ class FigureDetail(Page):
         on_delete=models.SET_NULL,
         related_name='+'
     )
-    media_type = models.ForeignKey(
-          'MediaSnippet',
-          null=True,
-          blank=True,
-          on_delete=models.SET_NULL,
-          related_name='+'
-      )
-
-
-    # MY_CHOICES = [
-    #     ('Acrylic', 'Acrylic'),
-    #     ('Oil', 'Oil'),
-    #     ('Watercolor', 'Watercolor'),
-    #     ('Print', 'Print'),
-    #     ('Graphite', 'Graphite'),
-    #     ('Pastel', 'Pastel'),
-    #     ('Mixed-Media', 'Mixed-Media'),
-    #     ('Sketchbook', 'Sketchbook'),
-    #     ('Pen and Ink', 'Pen and Ink'),
-    # ]
-
-    # media = models.CharField(
-    #     max_length=24,
-    #     choices=MY_CHOICES,
-    #     default=None
-    # )
 
     content_panels = Page.content_panels + [
         FieldPanel('subtitle'),
