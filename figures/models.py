@@ -108,10 +108,14 @@ class FigureDetail(Page):
     height = models.FloatField(blank=True,  help_text="Height in inches", null=True)
     for_sale = models.BooleanField(default=False)
     sold = models.BooleanField(default=False)
+    # A figure with no image renders an empty page -- the srcset tag and the
+    # social-share rendition both no-op -- so the admin requires one. null
+    # stays True because SET_NULL needs it, and because pages created before
+    # this must remain loadable; blank=False is what the editor enforces.
     image = models.ForeignKey(
         get_image_model(),
         null=True,
-        blank=True,
+        blank=False,
         on_delete=models.SET_NULL,
         related_name='+'
     )
