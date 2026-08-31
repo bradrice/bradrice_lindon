@@ -134,8 +134,33 @@ DATABASES = {
         # saving pages in the admin. 20s lets the contending write wait it out.
         # "timeout" mirrors this at the sqlite3.connect level so it applies
         # regardless of init_command ordering.
+        #
+        # The timeouts above are necessary but not sufficient, because they
+        # only govern waiting. Django begins a transaction with a bare "BEGIN"
+        # unless transaction_mode is set, and a bare BEGIN is DEFERRED: the
+        # transaction takes its read snapshot on the first SELECT and only
+        # tries to take the write lock on the first INSERT/UPDATE. If another
+        # connection committed in between, that upgrade fails with
+        # SQLITE_BUSY_SNAPSHOT *immediately* -- SQLite deliberately does not
+        # invoke the busy handler, because waiting cannot resolve it (the
+        # transaction would have to abandon the snapshot it already read
+        # from). So busy_timeout is bypassed entirely and the request 500s
+        # with "database is locked" no matter how high the timeout goes.
+        #
+        # This is what kept happening on /admin/pages/.../preview/ for newly
+        # added artwork: rendering a preview generates image renditions, and a
+        # rendition that does not exist yet is *written* to the database, so
+        # the read-heavy preview render turns into a write partway through --
+        # the exact read-then-upgrade shape above. Existing artwork already
+        # has its renditions cached, so previewing it never writes and never
+        # trips this, which is why only new pieces failed.
+        #
+        # BEGIN IMMEDIATE takes the write lock up front, so contention becomes
+        # an ordinary wait governed by busy_timeout instead of an instant
+        # error. Requires Django >= 5.1.
         "OPTIONS": {
             "timeout": 20,
+            "transaction_mode": "IMMEDIATE",
             "init_command": (
                 "PRAGMA journal_mode=WAL;"
                 "PRAGMA synchronous=NORMAL;"
