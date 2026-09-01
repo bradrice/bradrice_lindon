@@ -45,8 +45,12 @@
   {% if page.width and page.height %}
   <p>Dimensions: {{page.width | inches_and_cm}} width x {{page.height | inches_and_cm}} height</p>
   {% endif %}
-  {# "F Y" deliberately omits the day: the full date is stored, only the
-     month and year are shown. #}
+  {% comment %}
+     "F Y" deliberately omits the day: the full date is stored, only the
+     month and year are shown. Keep this in a comment block -- a hash-brace
+     comment spanning several lines is not recognised as a comment and
+     renders verbatim on the page.
+  {% endcomment %}
   {% if page.date_painted %}
   <p>Painted: {{ page.date_painted|date:"F Y" }}</p>
   {% endif %}
