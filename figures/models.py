@@ -106,6 +106,16 @@ class FigureDetail(Page):
     price = models.DecimalField(blank=True, default="0.00", max_digits=10, decimal_places=2)
     width = models.FloatField(blank=True, help_text="Width in inches", null=True)
     height = models.FloatField(blank=True,  help_text="Height in inches", null=True)
+    # Stored as a full date -- the day is kept even though the page shows only
+    # month and year, so the precision is there if it is ever wanted and the
+    # series sorts chronologically. Optional: older pieces may have no known
+    # date, and blank hides the line rather than showing a placeholder.
+    date_painted = models.DateField(
+        null=True,
+        blank=True,
+        help_text="When the piece was painted. Only the month and year are "
+                  "shown on the page. Leave blank if unknown.",
+    )
     for_sale = models.BooleanField(default=False)
     sold = models.BooleanField(default=False)
     # A figure with no image renders an empty page -- the srcset tag and the
@@ -128,6 +138,7 @@ class FigureDetail(Page):
         FieldPanel('price'),
         FieldPanel('width'),
         FieldPanel('height'),
+        FieldPanel('date_painted'),
         FieldPanel('for_sale'),
         FieldPanel('sold'),
         InlinePanel('gallery_images', label='Gallery Images'),
