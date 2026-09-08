@@ -41,6 +41,21 @@ ruff check --fix .
 ruff format .
 mypy .
 pytest .
+bin/lint-templates --all
+```
+
+### Template comments
+
+`{# … #}` is **single-line only**. Django's tokenizer matches it without
+`re.DOTALL`, so a hash-brace comment spanning two or more lines is never
+recognised as a comment — it renders to the visitor, braces and all, with no
+error. Use `{% comment %} … {% endcomment %}` for anything longer than one line.
+
+`bin/lint-templates` catches it. Install it as a pre-commit hook once per clone
+(git hooks are not version-controlled):
+
+```
+ln -sf ../../bin/lint-templates .git/hooks/pre-commit
 ```
 
 Before deploying, be sure to build the sass:
