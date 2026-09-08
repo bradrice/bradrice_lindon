@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+"""Reject Django template comments that silently render on the page.
+
+`{# ... #}` is a SINGLE-LINE comment. Django's tokenizer matches it with
+
+    tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
+
+and no re.DOTALL, so "." never matches a newline: a hash-brace comment
+spanning two or more lines is never recognised as a comment at all. It falls
+through as ordinary text and is rendered to the visitor, verbatim, braces and
+all. Nothing errors. It has shipped to production three times in these repos.
+
+`{% comment %} ... {% endcomment %}` is the multi-line form and is unaffected.
+
+Usage:
+    bin/lint-templates            # staged files only (pre-commit)
+    bin/lint-templates --all      # every template in the repo (manual / CI)
+    bin/lint-templates a.html b.html
+
+Exit status is 1 when something is found, so it works as a gate. Bypass a
+single commit with `git commit --no-verify` if you really need to.
+"""
+from __future__ import annotations
+
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+# Django renders .txt templates too (email bodies), and they leak just as badly.
+SUFFIXES = {".html", ".txt"}
+# Third-party template files are not ours to fix and would only add noise.
+SKIP_PARTS = {"node_modules", "env", ".venv", "venv", "site-packages",
+              ".git", "staticfiles", ".migration_backup", ".update_backup"}
+
+OPEN = re.compile(r"\{#")
+
+
+def offenders(path: Path) -> list[tuple[int, str]]:
+    """Line numbers where a `{#` has no `#}` later on the same line."""
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return []
+    found = []
+    for n, line in enumerate(lines, 1):
+        for m in OPEN.finditer(line):
+            # Only the remainder of THIS line counts. A `#}` on a later line
+            # is exactly the case Django fails to match.
+            if "#}" not in line[m.end():]:
+                found.append((n, line.strip()))
+                break
+    return found
+
+
+def wanted(path: Path) -> bool:
+    return (path.suffix in SUFFIXES
+            and not SKIP_PARTS.intersection(path.parts)
+            and path.is_file())
+
+
+def staged() -> list[Path]:
+    out = subprocess.run(
+        ["git", "diff", "--cached", "--name-only", "--diff-filter=ACMR"],
+        capture_output=True, text=True, check=False,
+    ).stdout
+    return [Path(p) for p in out.split("\n") if p]
+
+
+def everything() -> list[Path]:
+    out = subprocess.run(["git", "ls-files"], capture_output=True,
+                         text=True, check=False).stdout
+    return [Path(p) for p in out.split("\n") if p]
+
+
+def main(argv: list[str]) -> int:
+    args = argv[1:]
+    if args == ["--all"]:
+        paths = everything()
+    elif args:
+        paths = [Path(a) for a in args]
+    else:
+        paths = staged()
+
+    bad = [(p, hits) for p in paths if wanted(p) for hits in [offenders(p)] if hits]
+    if not bad:
+        return 0
+
+    print("Multi-line {# #} template comment(s) — these RENDER on the page:\n",
+          file=sys.stderr)
+    for path, hits in bad:
+        for n, text in hits:
+            print(f"  {path}:{n}: {text[:96]}", file=sys.stderr)
+    print("\nUse {% comment %} … {% endcomment %} instead.", file=sys.stderr)
+    print("Bypass once with: git commit --no-verify", file=sys.stderr)
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))
