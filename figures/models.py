@@ -52,7 +52,13 @@ class FigureIndex(Page):
         else:
             series_choice = request.session.get('series_choice', 'All')
 
-        all_figures = FigureDetail.objects.live().descendant_of(self)
+        # Applied here, on the base queryset, so it holds for every view of the
+        # gallery -- the media and series filters below both narrow this, and
+        # the paginator counts it, so a hidden piece cannot reappear through a
+        # filter combination or shift the page numbering.
+        all_figures = (FigureDetail.objects.live()
+                       .descendant_of(self)
+                       .filter(hide_from_index=False))
         all_figures = all_figures.order_by('weight', '-first_published_at')
         # media_array = all_figures.values_list('media_type', flat=True).distinct().order_by('media_type')
         media_array = MediaSnippet.objects.all().distinct().order_by('name')
@@ -118,6 +124,16 @@ class FigureDetail(Page):
     )
     for_sale = models.BooleanField(default=False)
     sold = models.BooleanField(default=False)
+    # Keeps a piece out of the gallery listing without unpublishing it, so a
+    # direct link still works -- useful for print editions and anything else
+    # that should not be browsed alongside the originals. The page stays live,
+    # so it can still appear in site search and the sitemap; unpublish instead
+    # if it needs to be genuinely non-public.
+    hide_from_index = models.BooleanField(
+        default=False,
+        help_text="Keep this piece off the Artwork gallery. It stays "
+                  "published and reachable by direct link.",
+    )
     # A figure with no image renders an empty page -- the srcset tag and the
     # social-share rendition both no-op -- so the admin requires one. null
     # stays True because SET_NULL needs it, and because pages created before
@@ -141,6 +157,7 @@ class FigureDetail(Page):
         FieldPanel('date_painted'),
         FieldPanel('for_sale'),
         FieldPanel('sold'),
+        FieldPanel('hide_from_index'),
         InlinePanel('gallery_images', label='Gallery Images'),
         FieldPanel('media_type'),
         InlinePanel('series_type', label='Series Types'),
