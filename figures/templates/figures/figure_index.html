@@ -74,7 +74,12 @@
             {% endif %}
 
             {% for page_num in figures.paginator.page_range %}
-              <li class="page-item {% if page_num == posts.number %} active{% endif %}">
+              {% comment %}
+                `figures`, not `posts`: nothing named posts exists in this
+                template, so the comparison was always false and no page was
+                ever marked active. Every other line here uses figures.
+              {% endcomment %}
+              <li class="page-item{% if page_num == figures.number %} active{% endif %}">
                 <a href="?page={{ page_num }}" class="page-link">
                   {{ page_num }}
                 </a>
