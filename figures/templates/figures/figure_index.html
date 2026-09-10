@@ -53,6 +53,9 @@
     <div class="figure-card col-lg-4 col-md-6 col-sm-12">
       <div class="figureblock col-sm-12">
         <a href="{{ figure.url}}">{% image figure.image width-300 %}</a>
+      {% if figure.sold %}
+      <p class="mb-1"><span class="badge bg-danger">Sold</span></p>
+      {% endif %}
       <p class="figure-title"><a href="{{ figure.url}}">{{ figure.title }}</a></p>
     </div>
   </div>
