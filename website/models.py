@@ -2,6 +2,8 @@
 Create or customize your page models here.
 """
 
+import logging
+
 from coderedcms.blocks import HTML_STREAMBLOCKS
 from coderedcms.blocks import LAYOUT_STREAMBLOCKS
 from coderedcms.blocks import BaseBlock
@@ -27,6 +29,11 @@ from wagtail.contrib.forms.models import FormMixin
 from wagtail.admin.panels import MultiFieldPanel
 from wagtail.fields import StreamField
 from wagtail.snippets.models import register_snippet
+
+from website import spam
+
+
+logger = logging.getLogger(__name__)
 
 
 class ArticlePage(CoderedArticlePage):
@@ -108,6 +115,39 @@ class FormPage(CoderedFormPage, FormMixin):
         verbose_name = "Form"
 
     template = "coderedcms/pages/form_page.html"
+
+    def contains_spam(self, request) -> bool:
+        """
+        Run CodeRed's check (reCAPTCHA or honeypot, per Layout Settings),
+        then the content filter in ``website.spam``, which catches the
+        captcha-solving sales spam that gets past it.
+        """
+        if super().contains_spam(request):
+            return True
+        if not self.spam_protection:
+            return False
+
+        emails, texts = [], []
+        for field in self.form_fields.all():
+            value = request.POST.get(field.clean_name, "")
+            if field.field_type == "email":
+                emails.append(value)
+            elif field.field_type in ("singleline", "multiline"):
+                texts.append(value)
+
+        reason = spam.find_spam_reason(
+            emails,
+            texts,
+            site_domain=self.get_site().hostname,
+            name=request.POST.get("full_name", ""),
+            subject=request.POST.get("subject", ""),
+        )
+        if reason:
+            logger.warning(
+                "Rejected spam on form page %r: %s", self.title, reason
+            )
+            return True
+        return False
 
 
 class FormPageField(CoderedFormField):
