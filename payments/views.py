@@ -112,9 +112,13 @@ def create_checkout_session(request):
                 return HttpResponseRedirect(checkout_session.url)
 
             else:
+                # ValueError covers a non-numeric id. Scanners post injection
+                # probes here (e.g. "46'tMPdSa<'\">)..."); uncaught, that fell
+                # through to the 502 handler below and emailed the admins on
+                # every probe. Junk input is a missing artwork, not a server fault.
                 try:
                     product = FigureDetail.objects.get(id=request.POST.get('product_id'))
-                except FigureDetail.DoesNotExist:
+                except (FigureDetail.DoesNotExist, ValueError):
                     logger.warning(
                         "artwork checkout: no FigureDetail with id=%r",
                         request.POST.get('product_id'),
