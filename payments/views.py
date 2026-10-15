@@ -1,12 +1,13 @@
-import json
 import logging
 import os
 from urllib.parse import urljoin
 
 import stripe
 from django.conf import settings  # new
-from django.http.response import (HttpResponse, HttpResponseNotFound,
-                                  HttpResponseRedirect, JsonResponse)
+from django.http.response import HttpResponse
+from django.http.response import HttpResponseNotFound
+from django.http.response import HttpResponseRedirect
+from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
@@ -14,6 +15,7 @@ from dotenv import load_dotenv
 from wagtail.images.models import Image
 
 from figures.models import FigureDetail
+
 
 ENV = os.getenv('DJANGO_ENV', 'development')
 
