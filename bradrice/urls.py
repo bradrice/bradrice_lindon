@@ -7,6 +7,8 @@ from django.urls import include
 from django.urls import path
 from wagtail.documents import urls as wagtaildocs_urls
 
+from figures import views as figure_views
+
 
 urlpatterns = [
     # Admin
@@ -20,6 +22,9 @@ urlpatterns = [
     # For anything not caught by a more specific rule above, hand over to
     # the page serving mechanism. This should be the last pattern in
     # the list:
+    # The artwork gallery is the front page. Before Wagtail's catch-all so it
+    # wins for "/" only; every other path routes as usual. See figures.views.
+    path("", figure_views.home, name="home"),
     path("", include(crx_urls)),
     # Alternatively, if you want pages to be served from a subpath
     # of your site, rather than the site root:
