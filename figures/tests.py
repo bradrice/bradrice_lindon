@@ -138,3 +138,37 @@ class FigureDetailRenderTests(TestCase):
         response = self._get(self._figure())
         self.assertNotContains(response, "{#")
         self.assertNotContains(response, "{% comment")
+
+
+class GalleryAtRootTests(TestCase):
+    """The site is rooted at Home; "/" shows the gallery in Home's place."""
+
+    @classmethod
+    def setUpTestData(cls):
+        root = Page.get_first_root_node()
+        cls.home = root.add_child(instance=Page(title="Home", slug="site-home"))
+        cls.index = cls.home.add_child(
+            instance=FigureIndex(title="Artwork", slug="artwork")
+        )
+        cls.about = cls.home.add_child(
+            instance=Page(title="About Me", slug="about-me")
+        )
+        Site.objects.update_or_create(
+            is_default_site=True,
+            defaults={"hostname": "localhost", "root_page": cls.home},
+        )
+
+    def test_root_serves_the_gallery(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "figures/figure_index.html")
+        self.assertEqual(response.context["page"].specific, self.index)
+
+    def test_pages_beside_the_gallery_keep_their_urls(self):
+        self.assertEqual(self.about.url, "/about-me/")
+        self.assertEqual(self.index.url, "/artwork/")
+
+    def test_falls_back_to_home_without_a_live_gallery(self):
+        self.index.unpublish()
+        response = self.client.get("/")
+        self.assertEqual(response.context["page"].specific, self.home)
